@@ -4,6 +4,7 @@ project/target
 target
 tmp
 dist
+bin
 .cache
 .settings
 .project
