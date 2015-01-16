@@ -7,19 +7,21 @@ import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import services.ExpensesService
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.util.Failure
 
-class ExpensesController(expensesService: ExpensesService) extends Controller {
+class ExpensesController(expensesService: ExpensesService)(implicit ex: ExecutionContext) extends Controller {
 
-  def addExpenses = Action { request =>
+  def addExpenses = Action.async { request =>
     request.body.asJson match {
       case Some(json) => json.validate[List[Expense]].fold(
-        errors => BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(errors))),
+        errors => Future.successful(BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(errors)))),
         expenses => {
-          expensesService.save(expenses)
-          NoContent
+          expensesService.save(expenses).map(_ => NoContent).recover { case _ => InternalServerError }
         }
       )
-      case _ => NotFound
+      case _ => Future.successful(NotFound)
     }
   }
 }

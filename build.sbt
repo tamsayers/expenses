@@ -7,7 +7,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 scalaVersion := "2.11.4"
 
 val dependencies = Seq(
-  "com.softwaremill.macwire" % "macros_2.11" % "0.7.3")
+  "com.softwaremill.macwire" % "macros_2.11" % "0.7.3",
+  "org.scala-lang.modules" % "scala-async_2.11" % "0.9.3")
 
 val testDependencies = Seq(
   "org.scalatestplus" %% "play" % "1.1.0", 
