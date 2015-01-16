@@ -11,6 +11,7 @@ import play.api.libs.json.JsValue
 import org.scalatest.mock.MockitoSugar
 import services.ExpensesService
 import org.mockito.Mockito._
+import scala.async.Async.async
 
 class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
 	import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -23,7 +24,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
   "add expenses" should {
     "parse json and save as expenses" in new testData {
       val request = FakeRequest().withJsonBody(validJson).withHeaders("Accept" -> "application/json")
-    	when(expensesService.save(List(Expense(value = 1.99)))).thenReturn(Future.successful())
+    	when(expensesService.save(List(Expense(value = 1.99)))).thenReturn(async{})
 
       val result = controller.addExpenses.apply(request)
 

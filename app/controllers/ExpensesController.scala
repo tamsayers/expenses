@@ -10,18 +10,19 @@ import services.ExpensesService
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.util.Failure
+import scala.async.Async.async
 
 class ExpensesController(expensesService: ExpensesService)(implicit ex: ExecutionContext) extends Controller {
 
   def addExpenses = Action.async { request =>
     request.body.asJson match {
       case Some(json) => json.validate[List[Expense]].fold(
-        errors => Future.successful(BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(errors)))),
+        errors => async(BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(errors)))),
         expenses => {
           expensesService.save(expenses).map(_ => NoContent).recover { case _ => InternalServerError }
         }
       )
-      case _ => Future.successful(NotFound)
+      case _ => async(NotFound)
     }
   }
 }
