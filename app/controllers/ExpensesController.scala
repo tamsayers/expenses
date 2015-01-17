@@ -14,15 +14,12 @@ import scala.async.Async.async
 
 class ExpensesController(expensesService: ExpensesService)(implicit ex: ExecutionContext) extends Controller {
 
-  def addExpenses = Action.async { request =>
-    request.body.asJson match {
+  def addExpenses = Action.async { _.body.asJson match {
       case Some(json) => json.validate[List[Expense]].fold(
         errors => async(BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(errors)))),
-        expenses => {
-          expensesService.save(expenses).map(_ => NoContent).recover { case _ => InternalServerError }
-        }
+        expenses => expensesService.save(expenses).map(_ => NoContent).recover { case _ => InternalServerError }
       )
-      case _ => async(NotFound)
+      case None => async(NotFound)
     }
   }
 }
