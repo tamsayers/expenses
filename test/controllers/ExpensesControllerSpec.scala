@@ -15,15 +15,18 @@ import scala.async.Async.async
 
 class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
 	import play.api.libs.concurrent.Execution.Implicits.defaultContext
-  trait testData {
+
+  val validJson = Json.parse("""[{ "value": 1.99 }]""")
+  val invalidJson = Json.parse("""[{ "novalue": "" }]""")
+
+  trait testController {
     val expensesService = mock[ExpensesService]
-    val validJson = Json.parse("""[{ "value": 1.99 }]""")
     val controller = new ExpensesController(expensesService)
   }
 
   "add expenses" should {
-    "parse json and save as expenses" in new testData {
-      val request = FakeRequest().withJsonBody(validJson).withHeaders("Accept" -> "application/json")
+    "parse json and save as expenses" in new testController {
+      val request = FakeRequest().withJsonBody(validJson)
     	when(expensesService.save(List(Expense(value = 1.99)))).thenReturn(async{})
 
       val result = controller.addExpenses.apply(request)
@@ -31,16 +34,16 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
       status(result) mustBe 204
     }
 
-    "give bad response for invalid json" in new testData {
-      val request = FakeRequest().withJsonBody(Json.parse("""[{ "noValue": "" }]""")).withHeaders("Accept" -> "application/json")
+    "give bad response for invalid json" in new testController {
+      val request = FakeRequest().withJsonBody(invalidJson)
 
       val result: Future[Result] = controller.addExpenses.apply(request)
 
       status(result) mustBe 400
     }
 
-    "gives ok response for valid json" in new testData {
-      val request = FakeRequest().withJsonBody(validJson).withHeaders("Accept" -> "application/json")
+    "gives ok response for valid json" in new testController {
+      val request = FakeRequest().withJsonBody(validJson)
       when(expensesService.save(List(Expense(value = 1.99)))).thenReturn(Future.failed(new Exception))
 
       val result: Future[Result] = controller.addExpenses.apply(request)
@@ -48,10 +51,8 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
       status(result) mustBe 500
     }
 
-    "gives not found for no json" in new testData {
-    	val request = FakeRequest().withHeaders("Accept" -> "application/json")
-
-			val result: Future[Result] = controller.addExpenses.apply(request)
+    "gives not found for no json" in new testController {
+			val result: Future[Result] = controller.addExpenses.apply(FakeRequest())
 
 			status(result) mustBe 404
     }

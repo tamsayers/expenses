@@ -6,4 +6,5 @@ case class Expense(value: Double)
 
 object Expense {
   implicit val expensesReads = Json.reads[Expense]
+  implicit val expensesWrites = Json.writes[Expense]
 }
