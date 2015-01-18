@@ -19,10 +19,9 @@ class JsonExpensesRepository(fileServer: FileServer)(implicit ex: ExecutionConte
     println(toSave.toString)
     val expensesFile = fileServer.file("expenses.json")
 
-//    val currentExpenses = Json.parse(Source.fromFile(expensesFile).mkString).as[JsArray]
+    val currentExpenses = Json.parse(Source.fromFile(expensesFile).mkString).as[JsArray]
 
-//    val updatedExpenses = currentExpenses +: toSave
-//    println(updatedExpenses.toString())
+    val updatedExpenses = currentExpenses ++ toSave
 
     val pw = new PrintWriter(expensesFile)
     try {
