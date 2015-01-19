@@ -15,19 +15,12 @@ trait ExpensesRepository {
 
 class JsonExpensesRepository(fileServer: FileServer)(implicit ex: ExecutionContext) extends ExpensesRepository {
   def save(expenses: Seq[Expense]): Future[Unit] = async {
-    val toSave = Json.toJson(expenses).as[JsArray]
-    println(toSave.toString)
     val expensesFile = fileServer.file("expenses.json")
 
-    val currentExpenses = Json.parse(Source.fromFile(expensesFile).mkString).as[JsArray]
+    val currentExpenses = Json.parse(expensesFile.text).as[JsArray]
 
-    val updatedExpenses = currentExpenses ++ toSave
+    val updatedExpenses = currentExpenses ++ Json.toJson(expenses).as[JsArray]
 
-    val pw = new PrintWriter(expensesFile)
-    try {
-      pw.print(toSave.toString())
-    } finally {
-      pw.close()
-    }
+    expensesFile.text_=(updatedExpenses.toString())
   }
 }
