@@ -1,20 +1,23 @@
 package controllers
 
+import java.time.LocalDate
+
+import scala.async.Async.async
+import scala.concurrent.Future
+
+import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play._
-import models.expenses.Expense
+
+import models.expenses._
+import play.api.libs.json._
 import play.api.mvc._
 import play.api.test._
 import play.api.test.Helpers._
-import play.api.libs.json.Json
-import scala.concurrent.Future
-import play.api.libs.json.JsValue
-import org.scalatest.mock.MockitoSugar
 import services.ExpensesService
-import org.mockito.Mockito._
-import scala.async.Async.async
 
 class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
-	import play.api.libs.concurrent.Execution.Implicits.defaultContext
+  import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
   val validJson = Json.parse("""[{ "value": 1.99 }]""")
   val invalidJson = Json.parse("""[{ "novalue": "" }]""")
@@ -31,30 +34,55 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
 
       val result = controller.addExpenses.apply(request)
 
-      status(result) mustBe 204
+      status(result) mustBe NO_CONTENT
     }
 
     "give bad response for invalid json" in new testController {
       val request = FakeRequest().withJsonBody(invalidJson)
 
-      val result: Future[Result] = controller.addExpenses.apply(request)
+      val result = controller.addExpenses.apply(request)
 
-      status(result) mustBe 400
+      status(result) mustBe BAD_REQUEST
     }
 
     "gives ok response for valid json" in new testController {
       val request = FakeRequest().withJsonBody(validJson)
       when(expensesService.save(List(Expense(value = 1.99)))).thenReturn(Future.failed(new Exception))
 
-      val result: Future[Result] = controller.addExpenses.apply(request)
+      val result = controller.addExpenses.apply(request)
 
-      status(result) mustBe 500
+      status(result) mustBe INTERNAL_SERVER_ERROR
     }
 
     "gives not found for no json" in new testController {
 			val result: Future[Result] = controller.addExpenses.apply(FakeRequest())
 
-			status(result) mustBe 404
+			status(result) mustBe NOT_FOUND
+    }
+  }
+
+  "expenses by date range" should {
+    import models.expenses.TestHelpers._
+    val till = LocalDate.now()
+    val from = LocalDate.now().minusDays(3)
+    val expenses = List(testExpense(value = 1), testExpense(value = 2))
+
+    "get the expenses in the given range" in new testController {
+      when(expensesService.forDates(DateQuery(from = from, till = till))).thenReturn(async(expenses))
+
+      val result = controller.forDates(from, till)(FakeRequest())
+
+      status(result) mustBe OK
+      contentAsJson(result).as[JsArray].value.size mustBe 2
+    }
+
+    "get the expenses in the correct format" in new testController {
+      when(expensesService.forDates(DateQuery(from = from, till = till))).thenReturn(async(expenses))
+
+      val result = controller.forDates(from, till)(FakeRequest())
+
+      val json = contentAsJson(result)
+      (json(0) \ "value").as[Double] mustBe 1
     }
   }
 }

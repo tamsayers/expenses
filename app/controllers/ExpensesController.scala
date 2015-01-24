@@ -11,6 +11,9 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.util.Failure
 import scala.async.Async.async
+import java.time.LocalDate
+import play.api.mvc.AnyContent
+import models.expenses.DateQuery
 
 class ExpensesController(expensesService: ExpensesService)(implicit ex: ExecutionContext) extends Controller {
 
@@ -20,6 +23,12 @@ class ExpensesController(expensesService: ExpensesService)(implicit ex: Executio
         expenses => expensesService.save(expenses).map(_ => NoContent).recover { case _ => InternalServerError }
       )
       case None => async(NotFound)
+    }
+  }
+
+  def forDates(from: LocalDate, till: LocalDate) = Action.async {
+    expensesService.forDates(DateQuery(from, till)).map { expenses =>
+      Ok(Json.toJson(expenses))
     }
   }
 }
