@@ -14,7 +14,7 @@ import java.time.LocalDate
 
 class JsonExpensesRepositorySpec extends PlaySpec with FutureAwaits with DefaultAwaitTimeout with MockitoSugar {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
-  val expenses = Seq(testExpense(value = 1.99, LocalDate.of(2015, 1, 24)))
+  val expenses = Seq(testExpense())
   val expensesFile = File.createTempFile("expenses", ".json")
 
   trait testRepo {
@@ -35,7 +35,7 @@ class JsonExpensesRepositorySpec extends PlaySpec with FutureAwaits with Default
 
       await(repo.save(expenses))
 
-      Source.fromFile(expensesFile).mkString mustBe """[{"value":1.99,"date":"2015-01-24"}]"""
+      Source.fromFile(expensesFile).mkString mustBe s"""[${defaultExpensesJson}]"""
     }
   }
 
