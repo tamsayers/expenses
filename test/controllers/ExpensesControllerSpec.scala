@@ -10,6 +10,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play._
 
 import models.expenses._
+import models.expenses.TestHelpers._
 import play.api.libs.json._
 import play.api.mvc._
 import play.api.test._
@@ -19,7 +20,7 @@ import services.ExpensesService
 class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-  val validJson = Json.parse("""[{ "value": 1.99 }]""")
+  val validJson = Json.parse("""[{ "value": 1.99, "date":"2015-01-24" }]""")
   val invalidJson = Json.parse("""[{ "novalue": "" }]""")
 
   trait testController {
@@ -30,7 +31,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
   "add expenses" should {
     "parse json and save as expenses" in new testController {
       val request = FakeRequest().withJsonBody(validJson)
-    	when(expensesService.save(List(Expense(value = 1.99)))).thenReturn(async{})
+    	when(expensesService.save(List(testExpense(value = 1.99, LocalDate.of(2015, 1, 24))))).thenReturn(async{})
 
       val result = controller.addExpenses.apply(request)
 
@@ -47,7 +48,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
 
     "gives ok response for valid json" in new testController {
       val request = FakeRequest().withJsonBody(validJson)
-      when(expensesService.save(List(Expense(value = 1.99)))).thenReturn(Future.failed(new Exception))
+      when(expensesService.save(List(testExpense(value = 1.99, LocalDate.of(2015, 1, 24))))).thenReturn(Future.failed(new Exception))
 
       val result = controller.addExpenses.apply(request)
 
