@@ -2,16 +2,18 @@ import com.softwaremill.macwire.MacwireMacros._
 import controllers.ExpensesController
 import services._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import repos.FileServer
-import java.io.File
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.async.Async.async
 
 object Application extends ServicesModule {
-  val fileServer = new FileServer {
-    def file(path: String): File = {
-      val userDir = new File(System.getProperty("user.home"))
-      new File(userDir, path)
+  val fileIo = new repos.FileIO {
+    var text = ""
+    def save(text: String): Future[Unit] = async {
+      this.text = text
     }
+
+    def read: Future[String] = async(text)
   }
 
   val expensesController = wire[ExpensesController]

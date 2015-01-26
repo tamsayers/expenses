@@ -15,13 +15,16 @@ trait ExpensesRepository {
   def forDates(dateQuery: DateQuery): Future[Seq[Expense]]
 }
 
-class JsonExpensesRepository(fileServer: FileServer)(implicit ex: ExecutionContext) extends ExpensesRepository {
-  def save(expenses: Seq[Expense]): Future[Unit] = async {
-    val expensesFile = fileServer.file("expenses.json")
-    val updatedExpenses = parse(expensesFile.text).as[JsArray] ++ toJson(expenses).as[JsArray]
+class JsonExpensesRepository(fileIo: FileIO)(implicit ex: ExecutionContext) extends ExpensesRepository {
 
-    expensesFile.text_=(updatedExpenses.toString())
+  def save(expenses: Seq[Expense]): Future[Unit] = fileIo.read.flatMap { saved =>
+    val updatedExpenses = parse(saved).as[JsArray] ++ toJson(expenses).as[JsArray]
+    fileIo.save(updatedExpenses.toString())
   }
 
-  def forDates(dateQuery: DateQuery): Future[Seq[Expense]] = ???
+  def forDates(dateQuery: DateQuery): Future[Seq[Expense]] = fileIo.read.map { saved =>
+    parse(saved).as[Seq[Expense]].filter { expense =>
+      expense.date.isAfter(dateQuery.from.minusDays(1)) && expense.date.isBefore(dateQuery.till.plusDays(1))
+    }
+  }
 }

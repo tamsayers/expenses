@@ -9,7 +9,7 @@ package object repos {
   trait ReposModule {
     import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-    val fileServer: FileServer
+    val fileIo: FileIO
     val expensesRepository = wire[JsonExpensesRepository]
   }
 
