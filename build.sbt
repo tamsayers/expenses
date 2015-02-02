@@ -2,9 +2,13 @@ name := "expenses-api"
 
 version := "1.0.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val fileIo = project
 
-scalaVersion := "2.11.4"
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
+                                      .aggregate(fileIo)
+                                      .dependsOn(fileIo)
+
+scalaVersion := Common.scalaVersion
 
 val dependencies = Seq(
   "com.softwaremill.macwire" % "macros_2.11" % "0.7.3",

@@ -1,6 +1,5 @@
 package repos
 
-import java.io.File
 import scala.concurrent.Future
 
 trait FileIO {

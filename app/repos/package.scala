@@ -12,17 +12,4 @@ package object repos {
     val fileIo: FileIO
     val expensesRepository = wire[JsonExpensesRepository]
   }
-
-  implicit class TextFile(file: File) {
-    def text: String = Source.fromFile(file).mkString
-
-    def text_=(text: String): Unit = {
-      val pw = new PrintWriter(file)
-      try {
-        pw.print(text)
-      } finally {
-        pw.close()
-      }
-    }
-  }
 }
