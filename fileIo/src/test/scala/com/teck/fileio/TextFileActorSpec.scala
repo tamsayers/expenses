@@ -14,8 +14,13 @@ import org.scalatest.BeforeAndAfterAll
 import com.teck.fileio.TextFileActor._
 import com.teck.fileio.FileIoActor._
 import scala.concurrent.duration._
+import akka.testkit.ImplicitSender
 
-class TextFileActorSpec extends TestKit(ActorSystem("FileActorSpec")) with WordSpecLike with MustMatchers with BeforeAndAfterAll {
+class TextFileActorSpec extends TestKit(ActorSystem("FileActorSpec"))
+    with WordSpecLike
+    with MustMatchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
 
   val timeout = 500 millis
 
@@ -23,10 +28,7 @@ class TextFileActorSpec extends TestKit(ActorSystem("FileActorSpec")) with WordS
     val fileIo = TestProbe()
     val fileIoMaker = (_: ActorRefFactory) => fileIo.ref
     val fileActor = TestActorRef(new TextFileActor(fileIoMaker))
-  }
-
-  override def afterAll() {
-    shutdown()
+    val savedText = "saved content"
   }
 
   "creating a text file actor" should {
@@ -45,17 +47,30 @@ class TextFileActorSpec extends TestKit(ActorSystem("FileActorSpec")) with WordS
     "update the file content with the new text" in new testFileActor {
       fileActor ! saveMessage
 
-      fileActor.underlyingActor.fileContent mustBe saveMessage.text
+      fileActor.underlyingActor.savedText mustBe saveMessage.text
     }
   }
 
-  "receiving a file contents message" should {
-    "set the file content to the actor" in new testFileActor {
-      val fileContent = "content"
+  "receiving a persisted message" should {
+    "set the persisted text to the actor" in new testFileActor {
 
-      fileActor ! Persisted(text = fileContent)
+      fileActor ! Persisted(text = savedText)
 
-      fileActor.underlyingActor.fileContent mustBe fileContent
+      fileActor.underlyingActor.savedText mustBe savedText
     }
+  }
+
+  "receiving a read call" should {
+    "return the current text to sender" in new testFileActor {
+      fileActor.underlyingActor.savedText = savedText
+
+      fileActor ! GetText
+
+      expectMsg(500 millis, "file content not received", savedText)
+    }
+  }
+
+  override def afterAll() {
+    shutdown()
   }
 }

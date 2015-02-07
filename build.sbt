@@ -18,4 +18,4 @@ val testDependencies = Seq(
   "org.scalatestplus" %% "play" % "1.1.0", 
   "org.mockito" % "mockito-all" % "1.10.19").map(_ % "test")
   
-libraryDependencies ++= dependencies ++ testDependencies
+libraryDependencies ++= dependencies ++ testDependencies ++ Common.testDependencies
