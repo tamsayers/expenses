@@ -4,6 +4,10 @@ import akka.actor.Actor
 import java.nio.file.Path
 import java.nio.file.Files._
 import com.teck.fileio.TextFileActor.Persisted
+import akka.actor.ActorSystem
+import akka.actor.Props
+import akka.actor.ActorRefFactory
+import akka.actor.ActorRef
 
 class FileIoActor(filePath: Path) extends Actor {
   import FileIoActor._
@@ -21,4 +25,8 @@ class FileIoActor(filePath: Path) extends Actor {
 object FileIoActor {
   case object Read
   case class Write(text: String)
+
+  def fileIoMakerFor(path: Path): ActorRefFactory => ActorRef = { refFactor =>
+    refFactor.actorOf(Props(classOf[FileIoActor], path))
+  }
 }

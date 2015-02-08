@@ -5,16 +5,19 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.async.Async.async
+import akka.actor.ActorSystem
+import akka.actor.ActorRef
+import com.teck.fileio.TextFileActor
+import akka.actor.Props
+import com.teck.fileio.FileIoActor
+import java.nio.file.Paths
 
 object Application extends ServicesModule {
-  val fileIo = new repos.FileIO {
-    var text = ""
-    def save(text: String): Future[Unit] = async {
-      this.text = text
-    }
+  val actorSystem = ActorSystem("expenses")
 
-    def read: Future[String] = async(text)
-  }
+  val userHome = System.getProperty("user.home")
+  val fileIoMaker = FileIoActor.fileIoMakerFor(Paths.get(userHome, "expenses.json"))
+  val textFileActor: ActorRef = actorSystem.actorOf(Props(classOf[TextFileActor], fileIoMaker), "textFile")
 
   val expensesController = wire[ExpensesController]
 }
