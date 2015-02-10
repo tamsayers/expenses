@@ -5,14 +5,13 @@ import org.scalatest.fixture.FeatureSpec
 import org.scalatest.FeatureSpecLike
 import org.scalatest.GivenWhenThen
 import org.scalatestplus.play.OneAppPerSuite
-import play.api.test.FakeApplication
+import play.api.test._
 
-class AddExpensesAccTest extends PlaySpec with OneAppPerSuite {
-
-  implicit override lazy val app: FakeApplication =
-    FakeApplication(additionalConfiguration = Map("ehcacheplugin" -> "disabled"))
+class AddExpensesAccTest extends PlaySpec with OneAppPerSuite with RouteInvokers with Writeables {
 
   "posted expenses data" should {
-    "be saved for retrieval" in pending
+    "be saved for retrieval" in {
+      route(FakeRequest("POST", "/expenses").withBody("[]"))
+    }
   }
 }

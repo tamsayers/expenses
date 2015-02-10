@@ -1,3 +1,5 @@
+import play.PlayImport.PlayKeys._
+
 name := "expenses-api"
 
 version := "1.0.0-SNAPSHOT"
@@ -19,3 +21,6 @@ val testDependencies = Seq(
   "org.mockito" % "mockito-all" % "1.10.19").map(_ % "test")
   
 libraryDependencies ++= dependencies ++ testDependencies ++ Common.testDependencies
+
+routesImport += "converters.PathBinders._"
+

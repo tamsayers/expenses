@@ -1,1 +1,2 @@
-POST /expenses @controllers.ExpensesController.addExpenses
+POST   /expenses   @controllers.ExpensesController.addExpenses
+GET    /expenses   @controllers.ExpensesController.forDates(from: java.time.LocalDate, till: java.time.LocalDate)

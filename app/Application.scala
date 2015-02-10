@@ -12,12 +12,15 @@ import akka.actor.Props
 import com.teck.fileio.FileIoActor
 import java.nio.file.Paths
 
-object Application extends ServicesModule {
-  val actorSystem = ActorSystem("expenses")
+trait Application extends ServicesModule {
+  lazy val actorSystem = ActorSystem("expenses")
 
-  val userHome = System.getProperty("user.home")
-  val fileIoMaker = FileIoActor.fileIoMakerFor(Paths.get(userHome, "expenses.json"))
-  val textFileActor: ActorRef = actorSystem.actorOf(Props(classOf[TextFileActor], fileIoMaker), "textFile")
+  lazy val userHome = System.getProperty("user.home")
+  lazy val expensesFilePath = Paths.get(userHome, "expenses.json")
+  lazy val fileIoMaker = FileIoActor.fileIoMakerFor(expensesFilePath)
+  lazy val textFileActor: ActorRef = actorSystem.actorOf(Props(classOf[TextFileActor], fileIoMaker), "textFile")
 
-  val expensesController = wire[ExpensesController]
+  lazy val expensesController = wire[ExpensesController]
 }
+
+object Application extends Application
