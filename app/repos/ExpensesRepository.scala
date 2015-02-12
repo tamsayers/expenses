@@ -9,6 +9,7 @@ import scala.concurrent.ExecutionContext
 import play.api.libs.json.JsArray
 import java.io.PrintWriter
 import models.expenses.DateQuery
+import play.api.libs.json.JsArray
 
 trait ExpensesRepository {
   def save(expenses: Seq[Expense]): Future[Unit]
@@ -18,13 +19,17 @@ trait ExpensesRepository {
 class JsonExpensesRepository(fileIo: FileIO)(implicit ex: ExecutionContext) extends ExpensesRepository {
 
   def save(expenses: Seq[Expense]): Future[Unit] = fileIo.read.flatMap { saved =>
-    val updatedExpenses = parse(saved).as[JsArray] ++ toJson(expenses).as[JsArray]
+    val savedExpenses = if (saved == "") JsArray() else parse(saved).as[JsArray]
+    val updatedExpenses = savedExpenses ++ toJson(expenses).as[JsArray]
     fileIo.save(updatedExpenses.toString())
   }
 
-  def forDates(dateQuery: DateQuery): Future[Seq[Expense]] = fileIo.read.map { saved =>
-    parse(saved).as[Seq[Expense]].filter { expense =>
-      expense.date.isAfter(dateQuery.from.minusDays(1)) && expense.date.isBefore(dateQuery.till.plusDays(1))
-    }
+  def forDates(dateQuery: DateQuery): Future[Seq[Expense]] = fileIo.read.map {
+    case "" => Nil
+    case saved => parse(saved).as[Seq[Expense]].filter(inRangeOf(dateQuery))
+  }
+
+  private def inRangeOf(dateQuery: DateQuery): Expense => Boolean = { expense =>
+    expense.date.isAfter(dateQuery.from.minusDays(1)) && expense.date.isBefore(dateQuery.till.plusDays(1))
   }
 }

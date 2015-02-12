@@ -27,6 +27,6 @@ class TextFileActor(fileIoMaker: ActorRefFactory => ActorRef) extends Actor {
       savedText = text
     }
     case Persisted(content) => savedText = content
-    case GetText => sender ! savedText
+    case GetText => sender ! FileText(text = savedText)
   }
 }

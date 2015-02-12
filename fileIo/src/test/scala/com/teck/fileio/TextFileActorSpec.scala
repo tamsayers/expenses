@@ -66,7 +66,7 @@ class TextFileActorSpec extends TestKit(ActorSystem("FileActorSpec"))
 
       fileActor ! GetText
 
-      expectMsg(500 millis, "file content not received", savedText)
+      expectMsg(500 millis, "file content not received", FileText(text = savedText))
     }
   }
 

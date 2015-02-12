@@ -24,10 +24,15 @@ class JsonExpensesRepositorySpec extends PlaySpec with FutureAwaits with Default
   }
 
   "save" should {
+    val exp = Seq(testExpense())
+    val saveResult = async{}
     "add the expenses to the file" in new testRepo {
-      val exp = Seq(testExpense())
-      val saveResult = async{}
+      when(fileIo.read()).thenReturn(async(""))
+      when(fileIo.save(s"""[${defaultExpensesJson}]""")).thenReturn(saveResult)
 
+      await(repo.save(exp)) mustBe ({})
+    }
+    "add to the existing expenses in the file" in new testRepo {
       when(fileIo.read()).thenReturn(async("[]"))
       when(fileIo.save(s"""[${defaultExpensesJson}]""")).thenReturn(saveResult)
 
@@ -36,8 +41,8 @@ class JsonExpensesRepositorySpec extends PlaySpec with FutureAwaits with Default
   }
 
   "for dates" should {
+    val now = LocalDate.now()
     "read the expenses and return the ones for the specified date range" in new testRepo {
-      val now = LocalDate.now()
       val exp = Seq(
           testExpense(date = now.minusDays(10)),
           testExpense(date = now.minusDays(5)),
@@ -49,6 +54,12 @@ class JsonExpensesRepositorySpec extends PlaySpec with FutureAwaits with Default
       when(fileIo.read).thenReturn(async(expensesJson))
 
       await(repo.forDates(DateQuery(from = now.minusDays(5), till = now.plusDays(2)))) mustBe exp.slice(1, 4)
+    }
+    "give an empty sequence for no file content"in new testRepo {
+      when(fileIo.read).thenReturn(async(""))
+
+      await(repo.forDates(DateQuery(from = now.minusDays(5), till = now.plusDays(2)))) mustBe Nil
+
     }
   }
 }
