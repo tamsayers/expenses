@@ -66,7 +66,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
     import models.expenses.TestHelpers._
     val till = LocalDate.now()
     val from = LocalDate.now().minusDays(3)
-    val expenses = List(testExpense(value = 1), testExpense(value = 2))
+    val expenses = List(testExpense(description = "desc1"), testExpense(description = "desc2"))
 
     "get the expenses in the given range" in new testController {
       when(expensesService.forDates(DateQuery(from = from, till = till))).thenReturn(async(expenses))
@@ -77,13 +77,13 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
       contentAsJson(result).as[JsArray].value.size mustBe 2
     }
 
-    "get the expenses in the correct format" in new testController {
+    "get the expenses in json format" in new testController {
       when(expensesService.forDates(DateQuery(from = from, till = till))).thenReturn(async(expenses))
 
       val result = controller.forDates(from, till)(FakeRequest())
 
       val json = contentAsJson(result)
-      (json(0) \ "value").as[Double] mustBe 1
+      (json(0) \ "description").as[String] mustBe "desc1"
     }
   }
 }

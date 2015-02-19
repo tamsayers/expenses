@@ -49,7 +49,7 @@ class ExpensesRoutesSpec extends PlaySpec
     "get the expenses for the given dates" in new mockExpensesController {
       val from = LocalDate.of(2015,2,1)
       val till = LocalDate.of(2015,3,4)
-      val expenses = List(testExpense(1.99, from), testExpense(2.99, till))
+      val expenses = List(testExpense(date = from), testExpense(date = till))
 
       when(expensesController.forDates(from, till)).thenReturn(Action { Results.Ok })
 

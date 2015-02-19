@@ -16,11 +16,11 @@ class AddExpensesAccTest extends PlaySpec with OneAppPerSuite with RouteInvokers
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
   "posted expenses data" should {
-    val expenses = List(
-      testExpense(1.99, LocalDate.of(2014,12,12)),
-      testExpense(2.99, LocalDate.of(2015,1,1)),
-      testExpense(3.99, LocalDate.of(2015,1,19)),
-      testExpense(3.99, LocalDate.of(2015,2,1))
+    val expenses = Seq(
+      testExpense(date = LocalDate.of(2014,12,12)),
+      testExpense(date = LocalDate.of(2015,1,1)),
+      testExpense(date = LocalDate.of(2015,1,19)),
+      testExpense(date = LocalDate.of(2015,2,1))
     )
 
     "be saved for retrieval" in {
