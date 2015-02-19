@@ -12,7 +12,7 @@ import play.api.test._
 class ExpensesServiceSpec extends PlaySpec with FutureAwaits with DefaultAwaitTimeout with MockitoSugar {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-  val expenses = List(testExpense(value = 1.99))
+  val expenses = List(testExpense())
 
   trait testService {
     val expensesRepo = mock[ExpensesRepository]
