@@ -9,9 +9,9 @@ sealed trait CostType {
 
 private object CostType {
   def apply(name: String): CostType = name match {
-    case "Simple"  => Simple()
     case "Vatable" => Vatable()
     case "Mileage" => Mileage()
+    case _  => Simple()
   }
   implicit val costTypeReads: Reads[CostType] = JsPath.read[String].map(CostType.apply)
   implicit val costTypeWrite: Writes[CostType] = Writes {
