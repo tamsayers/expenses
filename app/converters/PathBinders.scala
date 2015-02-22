@@ -7,12 +7,10 @@ import scala.util._
 import play.api.mvc.QueryStringBindable
 
 object PathBinders {
-  implicit val localDateBinder = new QueryStringBindable[LocalDate] {
-    def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, LocalDate]] = params.get(key).map { values =>
-      Try(LocalDate.parse(values(0), DateTimeFormatter.ISO_LOCAL_DATE)) match {
-        case Success(date) => Right(date)
-        case Failure(e)    => Left(e.getMessage)
-      }
+  implicit val localDateBinder = new PathBindable[LocalDate] {
+    def bind(key: String, value: String): Either[String, LocalDate] = Try(LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE)) match {
+      case Success(date) => Right(date)
+      case Failure(e)    => Left(e.getMessage)
     }
 
     def unbind(key: String, value: LocalDate): String = value.format(DateTimeFormatter.ISO_LOCAL_DATE)

@@ -29,7 +29,7 @@ class ExpensesForDatesAccTest extends PlaySpec
     "be retrieved" in {
       val result = route(FakeRequest("POST", "/expenses").withBody(Json.parse(toAddJson))).flatMap { result =>
         Thread.sleep(1000)
-        route(FakeRequest("GET", "/expenses?from=2015-01-01&till=2015-01-31"))
+        route(FakeRequest("GET", "/expenses/2015-01-01/to/2015-01-31"))
       }
 
       result mustBe 'defined
@@ -39,7 +39,7 @@ class ExpensesForDatesAccTest extends PlaySpec
     "be retrieved for a specific supplier" ignore {
       val result = route(FakeRequest("POST", "/expenses").withBody(Json.parse(forSupplierJson))).flatMap { result =>
         Thread.sleep(1000)
-        route(FakeRequest("GET", "/expenses?from=2015-02-01&till=2015-02-15&supplier=test-supplier"))
+        route(FakeRequest("GET", "/expenses/2015-02-01/to/2015-02-15&supplier=test-supplier"))
       }
 
       result mustBe 'defined

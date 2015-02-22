@@ -9,17 +9,12 @@ class PathBindersSpec extends PlaySpec with MockitoSugar {
 
   "local date" should {
     "be bound to some Right local date if valid" in {
-      localDateBinder.bind("date", Map("date" -> Seq("2015-01-01"))) mustBe Some(Right(LocalDate.of(2015,1,1)))
+      localDateBinder.bind("date", "2015-01-01") mustBe Right(LocalDate.of(2015,1,1))
     }
 
     "be bound to some Left if invalid" in {
-      val result = localDateBinder.bind("date", Map("date" -> Seq("not a date")))
-      result mustBe 'defined
-      result.get mustBe 'left
-    }
-
-    "be bound to none if param not found" in {
-      localDateBinder.bind("date", Map()) mustBe None
+      val result = localDateBinder.bind("date", "not a date")
+      result mustBe 'left
     }
 
     "be unbound" in {

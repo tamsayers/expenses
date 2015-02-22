@@ -53,7 +53,7 @@ class ExpensesRoutesSpec extends PlaySpec
 
       when(expensesController.forDates(from, till)).thenReturn(Action { Results.Ok })
 
-      val result = route(FakeRequest("GET", "/expenses?from=2015-2-1&till=2015-3-4"))
+      val result = route(FakeRequest("GET", "/expenses/2015-2-1/to/2015-3-4"))
 
       result mustBe 'defined
     }
