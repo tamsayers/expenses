@@ -1,0 +1,22 @@
+[
+  {
+    "date":"2015-02-01",
+    "description":"description",
+    "clientName":"client",
+    "supplier":"test-supplier",
+    "cost":{
+      "amount":100,
+      "costType":"Simple"
+    }
+  },
+  {
+    "date":"2015-02-12",
+    "description":"description",
+    "clientName":"client",
+    "supplier":"test-supplier",
+    "cost":{
+      "amount":2.99,
+      "costType":"Simple"
+    }
+  }  
+]
