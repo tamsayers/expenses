@@ -13,7 +13,7 @@ import scala.util.Failure
 import scala.async.Async.async
 import java.time.LocalDate
 import play.api.mvc.AnyContent
-import models.expenses.DateQuery
+import models.expenses.ExpensesQuery
 
 class ExpensesController(expensesService: ExpensesService)(implicit ex: ExecutionContext) extends Controller {
 
@@ -27,7 +27,7 @@ class ExpensesController(expensesService: ExpensesService)(implicit ex: Executio
   }
 
   def forDates(from: LocalDate, till: LocalDate) = Action.async {
-    expensesService.forDates(DateQuery(from, till)).map { expenses =>
+    expensesService.forDates(ExpensesQuery(from, till, None)).map { expenses =>
       Ok(Json.toJson(expenses))
     }
   }

@@ -69,7 +69,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
     val expenses = List(testExpense(description = "desc1"), testExpense(description = "desc2"))
 
     "get the expenses in the given range" in new testController {
-      when(expensesService.forDates(DateQuery(from = from, till = till))).thenReturn(async(expenses))
+      when(expensesService.forDates(testExpensesQuery(from = from, till = till))).thenReturn(async(expenses))
 
       val result = controller.forDates(from, till)(FakeRequest())
 
@@ -78,7 +78,16 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
     }
 
     "get the expenses in json format" in new testController {
-      when(expensesService.forDates(DateQuery(from = from, till = till))).thenReturn(async(expenses))
+      when(expensesService.forDates(testExpensesQuery(from = from, till = till))).thenReturn(async(expenses))
+
+      val result = controller.forDates(from, till)(FakeRequest())
+
+      val json = contentAsJson(result)
+      (json(0) \ "description").as[String] mustBe "desc1"
+    }
+
+    "get the expenses for the given range and supplier" ignore new testController {
+      when(expensesService.forDates(testExpensesQuery(from = from, till = till, supplier = Some("sup")))).thenReturn(async(expenses))
 
       val result = controller.forDates(from, till)(FakeRequest())
 

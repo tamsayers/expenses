@@ -9,7 +9,7 @@ import models.expenses.TestHelpers._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.test._
 import java.time.LocalDate
-import models.expenses.DateQuery
+import models.expenses.TestHelpers._
 import scala.async.Async.async
 import play.api.libs.json.Json
 import org.mockito.MockSettings
@@ -53,13 +53,12 @@ class JsonExpensesRepositorySpec extends PlaySpec with FutureAwaits with Default
       val expensesJson = Json.toJson(exp).toString
       when(fileIo.read).thenReturn(async(expensesJson))
 
-      await(repo.forDates(DateQuery(from = now.minusDays(5), till = now.plusDays(2)))) mustBe exp.slice(1, 4)
+      await(repo.forDates(testExpensesQuery(from = now.minusDays(5), till = now.plusDays(2)))) mustBe exp.slice(1, 4)
     }
     "give an empty sequence for no file content"in new testRepo {
       when(fileIo.read).thenReturn(async(""))
 
-      await(repo.forDates(DateQuery(from = now.minusDays(5), till = now.plusDays(2)))) mustBe Nil
-
+      await(repo.forDates(testExpensesQuery(from = now.minusDays(5), till = now.plusDays(2)))) mustBe Nil
     }
   }
 }

@@ -32,7 +32,7 @@ class ExpensesServiceSpec extends PlaySpec with FutureAwaits with DefaultAwaitTi
 
   "for dates" should {
     "get the expenses for the date query from the repository" in new testService {
-      val dateQuery = testDateQuery()
+      val dateQuery = testExpensesQuery()
       when(expensesRepo.forDates(dateQuery)).thenReturn(async(expenses))
 
       val result = expensesService.forDates(dateQuery)

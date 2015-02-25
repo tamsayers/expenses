@@ -11,6 +11,7 @@ object TestHelpers {
   val defaultExpensesJson = """{"date":"2015-01-24","description":"description","clientName":"client","supplier":"supplier","cost":{"amount":1.99,"costType":"Simple"}}"""
 
   def testCost(amount: BigDecimal = BigDecimal(1.99), costType: CostType = Simple()) = Cost(amount = amount, costType = costType)
-  def testDateQuery(from: LocalDate = LocalDate.now,
-                    till: LocalDate = LocalDate.now.plusDays(1)) = DateQuery(from = from, till = till)
+  def testExpensesQuery(from: LocalDate = LocalDate.now,
+                        till: LocalDate = LocalDate.now.plusDays(1),
+                        supplier: Option[String] = None) = ExpensesQuery(from = from, till = till, supplier = supplier)
 }
