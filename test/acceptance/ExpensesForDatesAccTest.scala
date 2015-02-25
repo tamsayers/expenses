@@ -36,10 +36,10 @@ class ExpensesForDatesAccTest extends PlaySpec
       contentAsString(result.get) mustBe Json.parse(expectedJson).toString
     }
 
-    "be retrieved for a specific supplier" ignore {
+    "be retrieved for a specific supplier" in {
       val result = route(FakeRequest("POST", "/expenses").withBody(Json.parse(forSupplierJson))).flatMap { result =>
         Thread.sleep(1000)
-        route(FakeRequest("GET", "/expenses/2015-02-01/to/2015-02-15&supplier=test-supplier"))
+        route(FakeRequest("GET", "/expenses/2015-02-01/to/2015-02-15?supplier=test-supplier"))
       }
 
       result mustBe 'defined

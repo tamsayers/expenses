@@ -1,2 +1,2 @@
 POST   /expenses                  @controllers.ExpensesController.addExpenses
-GET    /expenses/:from/to/:till   @controllers.ExpensesController.forDates(from: java.time.LocalDate, till: java.time.LocalDate)
+GET    /expenses/:from/to/:till   @controllers.ExpensesController.forDates(from: java.time.LocalDate, till: java.time.LocalDate, supplier: Option[String])

@@ -55,6 +55,19 @@ class JsonExpensesRepositorySpec extends PlaySpec with FutureAwaits with Default
 
       await(repo.forDates(testExpensesQuery(from = now.minusDays(5), till = now.plusDays(2)))) mustBe exp.slice(1, 4)
     }
+    "read the expenses and return the ones for the specified supplier" in new testRepo {
+      val exp = Seq(
+          testExpense(supplier = "right-supplier", description = "desc1", date = now),
+          testExpense(supplier = "right-supplier", description = "desc2", date = now),
+          testExpense(description = "desc3", date = now),
+          testExpense(supplier = "right-supplier", description = "desc4", date = now),
+          testExpense(description = "desc5", date = now)
+          )
+      val expensesJson = Json.toJson(exp).toString
+      when(fileIo.read).thenReturn(async(expensesJson))
+
+      await(repo.forDates(testExpensesQuery(supplier = Some("right-supplier")))) mustBe Seq(exp(0), exp(1), exp(3))
+    }
     "give an empty sequence for no file content"in new testRepo {
       when(fileIo.read).thenReturn(async(""))
 
