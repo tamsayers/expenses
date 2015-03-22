@@ -1,9 +1,9 @@
 import com.softwaremill.macwire.Macwire
-import play.api.GlobalSettings
-import play.api.Play
-import play.api.Mode
+import play.api._
+import play.api.mvc._
 
 object Global extends GlobalSettings with Macwire {
+
   lazy val wired = Play.current.mode match {
     case Mode.Test => wiredInModule(TestApplication)
     case _ => wiredInModule(Application)
