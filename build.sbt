@@ -1,4 +1,5 @@
 import play.PlayImport.PlayKeys._
+import com.typesafe.sbt.packager.docker._
 
 name := "expenses-api"
 
@@ -7,6 +8,7 @@ version := "1.0.0-SNAPSHOT"
 lazy val fileIo = project
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
+                                      .enablePlugins(DockerPlugin)
                                       .aggregate(fileIo)
                                       .dependsOn(fileIo)
 
