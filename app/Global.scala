@@ -1,8 +1,9 @@
 import com.softwaremill.macwire.Macwire
 import play.api._
 import play.api.mvc._
+import filters.CorsFilter
 
-object Global extends GlobalSettings with Macwire {
+object Global extends WithFilters(CorsFilter) with GlobalSettings with Macwire {
 
   lazy val wired = Play.current.mode match {
     case Mode.Test => wiredInModule(TestApplication)

@@ -7,7 +7,9 @@ import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import scala.concurrent.ExecutionContext
 
-class CorsFilter(implicit ex: ExecutionContext) extends Filter {
+object CorsFilter extends Filter {
+  import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
   def apply(f: RequestHeader => Future[Result])(rh: RequestHeader): Future[Result] = {
     f(rh).map { _.withHeaders("Access-Control-Allow-Origin" -> "*") }
   }

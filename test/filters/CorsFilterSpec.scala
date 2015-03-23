@@ -21,18 +21,17 @@ class CorsFilterSpec extends PlaySpec
 
   "the cors filter" should {
     "add the cross domain header" in {
-      val filter: Filter = new CorsFilter()
       val result = mock[Result]
       val resultWithHeaders = mock[Result]
       val requestHeader = mock[RequestHeader]
 
       Mockito.when(result.withHeaders("Access-Control-Allow-Origin" -> "*")).thenReturn(resultWithHeaders)
 
-      val f: RequestHeader => Future[Result] = { rh =>
+      val toResult: RequestHeader => Future[Result] = { rh =>
         if (rh == requestHeader) async(result) else fail()
       }
 
-      await(filter.apply(f)(requestHeader)) mustBe resultWithHeaders
+      await(CorsFilter(toResult)(requestHeader)) mustBe resultWithHeaders
     }
   }
 }
