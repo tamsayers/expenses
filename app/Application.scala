@@ -15,8 +15,7 @@ import java.nio.file.Paths
 trait Application extends ServicesModule {
   lazy val actorSystem = ActorSystem("expenses")
 
-  lazy val userHome = System.getProperty("user.home")
-  lazy val expensesFilePath = Paths.get(userHome, "expenses.json")
+  lazy val expensesFilePath = Paths.get("/var", "expenses", "expenses.json")
   lazy val fileIoMaker = FileIoActor.fileIoMakerFor(expensesFilePath)
   lazy val textFileActor: ActorRef = actorSystem.actorOf(Props(classOf[TextFileActor], fileIoMaker), "textFile")
 

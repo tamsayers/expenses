@@ -26,7 +26,7 @@ object FileIoActor {
   case object Read
   case class Write(text: String)
 
-  def fileIoMakerFor(path: Path): ActorRefFactory => ActorRef = { refFactor =>
-    refFactor.actorOf(Props(classOf[FileIoActor], path))
+  def fileIoMakerFor(path: Path): ActorRefFactory => ActorRef = { factory =>
+    factory.actorOf(Props(classOf[FileIoActor], path))
   }
 }

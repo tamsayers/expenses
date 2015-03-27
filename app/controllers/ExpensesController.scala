@@ -20,7 +20,12 @@ class ExpensesController(expensesService: ExpensesService)(implicit ex: Executio
   def addExpenses = Action.async { _.body.asJson match {
       case Some(json) => json.validate[List[Expense]].fold(
         errors => async(BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(errors)))),
-        expenses => expensesService.save(expenses).map(_ => NoContent).recover { case _ => InternalServerError }
+        expenses => expensesService.save(expenses).map(_ => NoContent).recover {
+          case e => {
+            // add logging of message
+            InternalServerError
+          }
+        }
       )
       case None => async(NotFound)
     }

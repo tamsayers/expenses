@@ -43,11 +43,13 @@ class TextFileActorSpec extends TestKit(ActorSystem("FileActorSpec"))
       fileActor ! saveMessage
 
       fileIo.expectMsgAllOf(timeout, Read, Write(text = saveMessage.text))
+      expectMsg(500 millis, "no response received", "ok")
     }
     "update the file content with the new text" in new testFileActor {
       fileActor ! saveMessage
 
       fileActor.underlyingActor.savedText mustBe saveMessage.text
+      expectMsg(500 millis, "no response received", "ok")
     }
   }
 

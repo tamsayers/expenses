@@ -3,6 +3,8 @@ import com.typesafe.sbt.packager.docker._
 
 name := "expenses-api"
 
+dockerBaseImage := "dockerfile/java:oracle-java8"
+
 version := "1.0.0-SNAPSHOT"
 
 lazy val fileIo = project
@@ -25,5 +27,4 @@ val testDependencies = Seq(
 libraryDependencies ++= dependencies ++ testDependencies ++ Common.testDependencies
 
 routesImport += "converters.PathBinders._"
-
 

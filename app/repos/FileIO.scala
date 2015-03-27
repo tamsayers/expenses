@@ -21,5 +21,5 @@ class ActorFileIO(textFileActor: ActorRef)(implicit ex: ExecutionContext) extend
 
   def read(): Future[String] = (textFileActor ? GetText).asInstanceOf[Future[FileText]].map(_.text)
 
-  def save(text: String): Future[Unit] = (textFileActor ? Save(text)).asInstanceOf[Future[Unit]]
+  def save(text: String): Future[scala.Unit] = (textFileActor ? Save(text)).map { _ => }
 }

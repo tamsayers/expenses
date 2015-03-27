@@ -33,8 +33,8 @@ class FileIOSpec extends TestKit(ActorSystem("FileIOSpec"))
       val result = fileIO.save("text")
 
       actorProbe.expectMsg(TextFileActor.Save("text"))
-      actorProbe.reply(Unit)
-      await(result) mustBe Unit
+      actorProbe.reply("ok")
+      await(result) mustBe ()
     }
   }
 
