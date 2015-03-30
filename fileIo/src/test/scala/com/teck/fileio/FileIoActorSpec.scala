@@ -6,7 +6,6 @@ import akka.actor.ActorSystem
 import java.nio.file._
 import com.teck.fileio.FileIoActor._
 import scala.concurrent.duration._
-import com.teck.fileio.TextFileActor.Persisted
 
 class FileIoActorSpec extends TestKit(ActorSystem("FileActorSpec")) with ImplicitSender with WordSpecLike with MustMatchers with BeforeAndAfterAll {
   val testFilePath = Files.createTempFile("fileIoActor", ".text")
@@ -23,7 +22,7 @@ class FileIoActorSpec extends TestKit(ActorSystem("FileActorSpec")) with Implici
     "read the file contents and return to sender" in {
       fileActor ! Read
 
-      expectMsg(1 second, "file contents not returned", Persisted(text = text))
+      expectMsg(1 second, "file contents not returned", Content(text = text))
     }
   }
 
@@ -34,6 +33,11 @@ class FileIoActorSpec extends TestKit(ActorSystem("FileActorSpec")) with Implici
       fileActor ! Write(text = "new file contents")
 
       awaitAssert(Files.readAllLines(testFilePath).mkString mustBe "new file contents", 2 seconds, 500 millis )
+    }
+    "responds when written" in {
+      fileActor ! Write(text = "new file contents")
+
+      expectMsg(1 second, "no written response", Persisted)
     }
   }
 

@@ -7,7 +7,6 @@ import akka.actor.ActorRef
 
 object TextFileActor {
   final case class Save(text: String)
-  final case class Persisted(text: String)
   final case class FileText(text: String)
   final case object GetText
 }
@@ -21,14 +20,21 @@ class TextFileActor(fileIoMaker: ActorRefFactory => ActorRef) extends Actor {
 
   fileIo ! Read
 
-  def receive = {
+  def initialised: Receive = {
     case Save(text) => {
       fileIo ! Write(text)
       savedText = text
       // temporary work around
       sender ! "ok"
     }
-    case Persisted(content) => savedText = content
     case GetText => sender ! FileText(text = savedText)
+    case Persisted =>
+  }
+
+  def receive = {
+    case Content(content) => {
+      savedText = content
+      context.become(initialised)
+    }
   }
 }

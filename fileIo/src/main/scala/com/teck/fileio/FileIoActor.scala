@@ -3,7 +3,6 @@ package com.teck.fileio
 import akka.actor.Actor
 import java.nio.file.Path
 import java.nio.file.Files._
-import com.teck.fileio.TextFileActor.Persisted
 import akka.actor.ActorSystem
 import akka.actor.Props
 import akka.actor.ActorRefFactory
@@ -16,15 +15,20 @@ class FileIoActor(filePath: Path) extends Actor {
   def receive = {
     case Read => {
       val text = new String(readAllBytes(filePath), "UTF-8")
-      sender ! Persisted(text = text)
+      sender ! Content(text = text)
     }
-    case Write(text) => write(filePath, text.getBytes("UTF-8"), WRITE, TRUNCATE_EXISTING, CREATE)
+    case Write(text) => {
+      write(filePath, text.getBytes("UTF-8"), WRITE, TRUNCATE_EXISTING, CREATE)
+      sender ! Persisted
+    }
   }
 }
 
 object FileIoActor {
   case object Read
-  case class Write(text: String)
+  case object Persisted
+  final case class Content(text: String)
+  final case class Write(text: String)
 
   def fileIoMakerFor(path: Path): ActorRefFactory => ActorRef = { factory =>
     factory.actorOf(Props(classOf[FileIoActor], path))

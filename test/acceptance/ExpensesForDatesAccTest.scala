@@ -25,6 +25,9 @@ class ExpensesForDatesAccTest extends PlaySpec
   val expectedJson = Source.fromURL(getClass.getResource("/resources/acceptance/daterange/expected.json")).mkString
   val expectedForSupplierJson = Source.fromURL(getClass.getResource("/resources/acceptance/daterange/expectedForSupplier.json")).mkString
 
+  // wait while the application initialises
+  Thread.sleep(500)
+
   "expenses for a date range" should {
     "be retrieved" in {
       val result = route(FakeRequest("POST", "/expenses").withBody(Json.parse(toAddJson))).flatMap { result =>

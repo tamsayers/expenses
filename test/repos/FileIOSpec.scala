@@ -34,6 +34,7 @@ class FileIOSpec extends TestKit(ActorSystem("FileIOSpec"))
 
       actorProbe.expectMsg(TextFileActor.Save("text"))
       actorProbe.reply("ok")
+
       await(result) mustBe ()
     }
   }

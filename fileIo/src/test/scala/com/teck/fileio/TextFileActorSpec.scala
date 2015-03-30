@@ -24,28 +24,40 @@ class TextFileActorSpec extends TestKit(ActorSystem("FileActorSpec"))
 
   val timeout = 500 millis
 
-  trait testFileActor {
+  trait uninititialisedFileActor {
     val fileIo = TestProbe()
     val fileIoMaker = (_: ActorRefFactory) => fileIo.ref
     val fileActor = TestActorRef(new TextFileActor(fileIoMaker))
     val savedText = "saved content"
   }
 
+  trait inititialisedFileActor extends uninititialisedFileActor {
+    fileActor ! Content(text = savedText)
+  }
+
   "creating a text file actor" should {
-    "send a read message to the fileIo actor" in new testFileActor {
+    "send a read message to the fileIo actor" in new uninititialisedFileActor {
       fileIo.expectMsg(timeout, "initial read request not made", Read)
+    }
+  }
+
+  "receiving a persisted message" should {
+    "set the persisted text to the actor" in new uninititialisedFileActor {
+      fileActor ! Content(text = savedText)
+
+      fileActor.underlyingActor.savedText mustBe savedText
     }
   }
 
   "receiving a save text call" should {
     val saveMessage = Save(text = "text to save")
-    "send the persist message to the fileIo actor" in new testFileActor {
+    "send the persist message to the fileIo actor" in new inititialisedFileActor {
       fileActor ! saveMessage
 
       fileIo.expectMsgAllOf(timeout, Read, Write(text = saveMessage.text))
       expectMsg(500 millis, "no response received", "ok")
     }
-    "update the file content with the new text" in new testFileActor {
+    "update the file content with the new text" in new inititialisedFileActor {
       fileActor ! saveMessage
 
       fileActor.underlyingActor.savedText mustBe saveMessage.text
@@ -53,19 +65,8 @@ class TextFileActorSpec extends TestKit(ActorSystem("FileActorSpec"))
     }
   }
 
-  "receiving a persisted message" should {
-    "set the persisted text to the actor" in new testFileActor {
-
-      fileActor ! Persisted(text = savedText)
-
-      fileActor.underlyingActor.savedText mustBe savedText
-    }
-  }
-
   "receiving a read call" should {
-    "return the current text to sender" in new testFileActor {
-      fileActor.underlyingActor.savedText = savedText
-
+    "return the current text to sender" in new inititialisedFileActor {
       fileActor ! GetText
 
       expectMsg(500 millis, "file content not received", FileText(text = savedText))
