@@ -20,10 +20,10 @@ class ExpensesForDatesAccTest extends PlaySpec
     with BeforeAndAfterAll {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-  val toAddJson = Source.fromURL(getClass.getResource("/resources/acceptance/daterange/toAdd.json")).mkString
-  val forSupplierJson = Source.fromURL(getClass.getResource("/resources/acceptance/daterange/supplier.json")).mkString
-  val expectedJson = Source.fromURL(getClass.getResource("/resources/acceptance/daterange/expected.json")).mkString
-  val expectedForSupplierJson = Source.fromURL(getClass.getResource("/resources/acceptance/daterange/expectedForSupplier.json")).mkString
+  val toAddJson = Source.fromURL(getClass.getResource("/acceptance/daterange/toAdd.json")).mkString
+  val forSupplierJson = Source.fromURL(getClass.getResource("/acceptance/daterange/supplier.json")).mkString
+  val expectedJson = Source.fromURL(getClass.getResource("/acceptance/daterange/expected.json")).mkString
+  val expectedForSupplierJson = Source.fromURL(getClass.getResource("/acceptance/daterange/expectedForSupplier.json")).mkString
 
   // wait while the application initialises
   Thread.sleep(500)
