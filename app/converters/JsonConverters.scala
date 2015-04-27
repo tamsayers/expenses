@@ -9,6 +9,6 @@ trait ToJson {
 
 trait JsonConverters {
   implicit def errorsToJson(errors: Seq[(JsPath, Seq[ValidationError])]): ToJson = new ToJson {
-    def toJson: JsObject = Json.obj("status" -> "KO")
+    def toJson: JsObject = Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(errors))
   }
 }
