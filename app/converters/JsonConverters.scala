@@ -8,7 +8,8 @@ trait ToJson {
 }
 
 trait JsonConverters {
+  // same as implicit class but allows overriding and mocking for tests
   implicit def errorsToJson(errors: Seq[(JsPath, Seq[ValidationError])]): ToJson = new ToJson {
-    def toJson: JsObject = Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(errors))
+    def toJson: JsObject = Json.obj("errors" -> JsError.toFlatJson(errors))
   }
 }

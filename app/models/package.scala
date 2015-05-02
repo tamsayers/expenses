@@ -3,8 +3,17 @@ import java.time.LocalDate
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import scala.math.BigDecimal
+import scala.util.Try
 
 package object models {
+  object IsLocalDate {
+    def unapply(dateString: String): Option[String] = Try {
+        LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE)
+        Some(dateString)
+    }.getOrElse(None)
+
+  }
+
   implicit val localDateJsonWrites: Writes[LocalDate] = new Writes[LocalDate] {
     def writes(date: LocalDate): JsValue = {
       JsString(date.format(DateTimeFormatter.ISO_LOCAL_DATE))
@@ -12,7 +21,10 @@ package object models {
   }
   implicit val localDateJsonReads: Reads[LocalDate] = new Reads[LocalDate] {
     def reads(json: JsValue): JsResult[LocalDate] = json match {
-      case JsString(dateString) => JsSuccess(LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE))
+      case JsString(aString) => aString match {
+        case IsLocalDate(dateString) => JsSuccess(LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE))
+        case _ => JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.localdate"))))
+      }
       case _ => JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.jsstring"))))
     }
   }
