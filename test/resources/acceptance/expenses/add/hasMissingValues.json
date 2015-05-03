@@ -1,0 +1,14 @@
+[
+  {
+    "supplier":"supplier",
+    "cost":{
+      "amount":1.99,
+      "costType":"Simple"
+    }
+  },
+  {
+    "date":"2015-01-01",
+    "description":"description",
+    "clientName":"client"
+  }
+]

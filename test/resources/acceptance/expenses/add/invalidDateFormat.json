@@ -1,0 +1,12 @@
+[
+  {
+    "date":"not-a-date",
+    "description":"description",
+    "clientName":"client",
+    "supplier":"supplier",
+    "cost":{
+      "amount":1.99,
+      "costType":"Simple"
+    }
+  }
+]
