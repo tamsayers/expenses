@@ -19,6 +19,7 @@ class AddExpensesAccTest extends PlaySpec
 
   val missingValueJson = Source.fromURL(getClass.getResource("/acceptance/expenses/add/hasMissingValues.json")).mkString
   val invalidDateJson = Source.fromURL(getClass.getResource("/acceptance/expenses/add/invalidDateFormat.json")).mkString
+  val invalidCostJson = Source.fromURL(getClass.getResource("/acceptance/expenses/add/invalidCostFormat.json")).mkString
 
   def errorMessage(index: Int, property: String)(implicit result: JsValue): String = ((result \ "errors" \ s"obj[$index].$property")(0) \ "msg").as[String]
 
@@ -27,6 +28,8 @@ class AddExpensesAccTest extends PlaySpec
       val optionalResult = route(FakeRequest("POST", "/expenses").withBody(Json.parse(missingValueJson)))
 
       optionalResult mustBe defined
+
+      status(optionalResult.get) mustBe 400
       implicit val result = contentAsJson(optionalResult.get)
 
       errorMessage(0, "date") mustBe "error.path.missing"
@@ -40,9 +43,20 @@ class AddExpensesAccTest extends PlaySpec
       val optionalResult = route(FakeRequest("POST", "/expenses").withBody(Json.parse(invalidDateJson)))
 
       optionalResult mustBe defined
+      status(optionalResult.get) mustBe 400
       implicit val result = contentAsJson(optionalResult.get)
 
       errorMessage(0, "date") mustBe "error.expected.localdate"
+    }
+
+    "be returned for an cost value" in {
+      val optionalResult = route(FakeRequest("POST", "/expenses").withBody(Json.parse(invalidCostJson)))
+
+      optionalResult mustBe defined
+      status(optionalResult.get) mustBe 400
+      implicit val result = contentAsJson(optionalResult.get)
+
+      errorMessage(0, "cost.amount") mustBe "error.expected.jsnumber"
     }
   }
 }
