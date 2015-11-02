@@ -3,7 +3,7 @@ import com.typesafe.sbt.packager.docker._
 
 name := "expenses-api"
 
-dockerBaseImage := "dockerfile/java:oracle-java8"
+dockerBaseImage := "java:8"
 
 version := "1.0.0-SNAPSHOT"
 
