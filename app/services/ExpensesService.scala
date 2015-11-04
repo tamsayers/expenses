@@ -1,10 +1,10 @@
 package services
 
-import repos.ExpensesRepository
-import models.expenses.Expense
 import scala.concurrent.Future
+
+import models.expenses.Expense
 import models.expenses.ExpensesQuery
-import models.expenses.Converters.toCompanyCostFromExpenseWithVatRate
+import repos.ExpensesRepository
 
 trait ExpensesService {
   def save(expenses: Seq[Expense]): Future[Unit]

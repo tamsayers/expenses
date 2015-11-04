@@ -1,15 +1,15 @@
 package services
 
-import org.scalatestplus.play.PlaySpec
-import org.scalatest.mock.MockitoSugar
-import repos.ExpensesRepository
-import org.mockito.Mockito._
 import scala.async.Async._
+
+import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.PlaySpec
+
 import models.expenses.Expense
 import models.expenses.TestHelpers._
 import play.api.test._
-import models.expenses.CompanyCost
-import models.expenses.Converters.toCompanyCostFromExpenseWithVatRate
+import repos.ExpensesRepository
 
 class ExpensesServiceSpec extends PlaySpec with FutureAwaits with DefaultAwaitTimeout with MockitoSugar {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
