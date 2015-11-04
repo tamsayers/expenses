@@ -16,7 +16,6 @@ trait ExpensesRepository {
 }
 
 class JsonExpensesRepository(fileIo: FileIO)(implicit ex: ExecutionContext) extends ExpensesRepository {
-
   def save(expenses: Seq[Expense]): Future[Unit] = fileIo.read.flatMap { saved =>
     val savedExpenses = if (saved == "") JsArray() else parse(saved).as[JsArray]
     val updatedExpenses = savedExpenses ++ toJson(expenses).as[JsArray]

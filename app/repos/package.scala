@@ -6,7 +6,7 @@ import akka.actor.ActorRefFactory
 import akka.actor.ActorRef
 
 package object repos {
-  import com.softwaremill.macwire.MacwireMacros._
+  import com.softwaremill.macwire._
 
   trait ReposModule {
     import play.api.libs.concurrent.Execution.Implicits.defaultContext

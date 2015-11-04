@@ -8,15 +8,18 @@ import scala.async.Async._
 import models.expenses.Expense
 import models.expenses.TestHelpers._
 import play.api.test._
+import models.expenses.CompanyCost
+import models.expenses.Converters.toCompanyCostFromExpenseWithVatRate
 
 class ExpensesServiceSpec extends PlaySpec with FutureAwaits with DefaultAwaitTimeout with MockitoSugar {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
+  val vatRate = 0.2
   val expenses = List(testExpense())
 
   trait testService {
     val expensesRepo = mock[ExpensesRepository]
-    val expensesService = new RepositoryExpensesService(expensesRepo)
+    val expensesService = new RepositoryExpensesService(expensesRepo, vatRate)
   }
 
   "save" should {

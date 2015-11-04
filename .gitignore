@@ -1,12 +1,10 @@
-logs
-node_modules/
-project/project
-project/target
+/logs
+/project/project
+/project/target
 target
 tmp
-dist
-bin
-.cache
+/bin
+.cache*
 .settings
 .project
 .classpath

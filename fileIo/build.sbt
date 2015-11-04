@@ -9,3 +9,5 @@ val compileDependencies = Seq("com.typesafe.akka" % "akka-actor_2.11" % "2.3.4")
 libraryDependencies ++= compileDependencies ++ testDependencies ++ Common.testDependencies
 
 EclipseKeys.skipParents in ThisBuild := false
+
+EclipseKeys.withSource := true

@@ -17,7 +17,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 scalaVersion := Common.scalaVersion
 
 val dependencies = Seq(
-  "com.softwaremill.macwire" % "macros_2.11" % "0.7.3",
+  "com.softwaremill.macwire" % "macros_2.11" % "1.0.7",
   "org.scala-lang.modules" % "scala-async_2.11" % "0.9.3")
 
 val testDependencies = Seq(
@@ -28,3 +28,4 @@ libraryDependencies ++= dependencies ++ testDependencies ++ Common.testDependenc
 
 routesImport += "converters.PathBinders._"
 
+EclipseKeys.withSource := true

@@ -28,5 +28,5 @@ case class Cost(amount: BigDecimal, costType: CostType)
 object Cost {
   import models._
 
-  implicit val locationFormat: Format[Cost] = Json.format[Cost]
+  implicit val costFormat: Format[Cost] = Json.format[Cost]
 }

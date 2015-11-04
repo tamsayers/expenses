@@ -1,4 +1,4 @@
-import com.softwaremill.macwire.MacwireMacros._
+import com.softwaremill.macwire._
 import controllers.ExpensesController
 import services._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -13,8 +13,8 @@ import com.teck.fileio.FileIoActor
 import java.nio.file.Paths
 
 trait Application extends ServicesModule {
+  val vatRate = 0.2
   lazy val actorSystem = ActorSystem("expenses")
-
   lazy val expensesFilePath = Paths.get("/var", "expenses", "expenses.json")
   lazy val fileIoMaker = FileIoActor.fileIoMakerFor(expensesFilePath)
   lazy val textFileActor: ActorRef = actorSystem.actorOf(Props(classOf[TextFileActor], fileIoMaker), "textFile")
