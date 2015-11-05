@@ -105,7 +105,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
       val result = controller.forDates(from, till)(FakeRequest())
 
       status(result) mustBe OK
-      verify(expensesService).forDatesOld(testExpensesQuery(from = from, till = till))//).thenReturn(async(Nil))
+      verify(expensesService).forDatesOld(testExpensesQuery(from = from, till = till))
     }
 
     "get the expenses in json format" in new testController {

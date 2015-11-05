@@ -1,15 +1,14 @@
 package services
 
 import scala.async.Async._
-
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-
 import models.expenses.Expense
 import models.expenses.TestHelpers._
 import play.api.test._
 import repos.ExpensesRepository
+import models.expenses.Converters
 
 class ExpensesServiceSpec extends PlaySpec with FutureAwaits with DefaultAwaitTimeout with MockitoSugar {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -41,6 +40,15 @@ class ExpensesServiceSpec extends PlaySpec with FutureAwaits with DefaultAwaitTi
       val result = expensesService.forDatesOld(dateQuery)
 
       await(result) mustBe expenses
+    }
+
+    "get the simple expenses for the date query from the repository and create the company costs" in new testService {
+      val dateQuery = testExpensesQuery()
+      when(expensesRepo.forDates(dateQuery)).thenReturn(async(expenses))
+
+      val result = expensesService.forDates(dateQuery)
+
+      await(result) mustBe expenses.map(Converters.toCompanyCostFromExpenseWithVatRate(vatRate))
     }
   }
 }
