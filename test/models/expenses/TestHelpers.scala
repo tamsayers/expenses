@@ -14,4 +14,15 @@ object TestHelpers {
   def testExpensesQuery(from: LocalDate = LocalDate.now,
                         till: LocalDate = LocalDate.now.plusDays(1),
                         supplier: Option[String] = None) = ExpensesQuery(from = from, till = till, supplier = supplier)
+
+  def testAmount(gross: BigDecimal = 1.00,
+                 net: BigDecimal = 1.00,
+                 vat: Option[Double] = None,
+                 details: Option[String] = None) = Amount(gross = gross, net = net, vat = vat, details = details)
+
+  def testCompanyCost(date: LocalDate = LocalDate.of(2015, 1, 24),
+                      description: String = "description",
+                      clientName: String = "client",
+                      supplier: String = "supplier",
+                      amount: Amount = testAmount()) = CompanyCost(date = date, description = description, clientName = clientName, supplier = supplier, amount = amount)
 }

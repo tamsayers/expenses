@@ -21,11 +21,11 @@ val dependencies = Seq(
   "org.scala-lang.modules" % "scala-async_2.11" % "0.9.3")
 
 val testDependencies = Seq(
-  "org.scalatestplus" %% "play" % "1.1.0", 
+  "org.scalatestplus" % "play_2.11" % "1.2.0",
   "org.mockito" % "mockito-all" % "1.10.19").map(_ % "test")
   
 libraryDependencies ++= dependencies ++ testDependencies ++ Common.testDependencies
 
 routesImport += "converters.PathBinders._"
 
-EclipseKeys.withSource := true
+EclipseKeys.withSource in ThisBuild := true

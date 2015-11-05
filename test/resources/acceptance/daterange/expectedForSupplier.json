@@ -5,8 +5,8 @@
     "clientName":"client",
     "supplier":"test-supplier",
     "cost":{
-      "amount":100,
-      "costType":"Simple"
+      "gross":100,
+      "net":100
     }
   },
   {
@@ -15,8 +15,8 @@
     "clientName":"client",
     "supplier":"test-supplier",
     "cost":{
-      "amount":2.99,
-      "costType":"Simple"
+      "gross":2.99,
+      "net":2.99
     }
   }  
 ]

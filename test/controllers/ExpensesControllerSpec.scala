@@ -1,22 +1,38 @@
 package controllers
 
 import java.time.LocalDate
+
 import scala.async.Async.async
 import scala.concurrent.Future
-import org.mockito.Matchers._
-import org.mockito.Mockito._
+
+import org.mockito.Matchers.any
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play._
-import models.expenses._
-import models.expenses.TestHelpers._
-import play.api.libs.json._
-import play.api.mvc._
-import play.api.test._
-import play.api.test.Helpers._
-import services.ExpensesService
-import play.api.data.validation.ValidationError
-import converters.JsonConverters
+import org.scalatestplus.play.PlaySpec
+
 import converters.ToJson
+import models.expenses.TestHelpers
+import models.expenses.TestHelpers.defaultExpensesJson
+import models.expenses.TestHelpers.testExpense
+import play.api.data.validation.ValidationError
+import play.api.libs.concurrent.Execution.Implicits
+import play.api.libs.json.JsArray
+import play.api.libs.json.JsPath
+import play.api.libs.json.Json
+import play.api.libs.json.Json.toJsFieldJsValueWrapper
+import play.api.mvc.Result
+import play.api.mvc.Results
+import play.api.test.FakeRequest
+import play.api.test.Helpers.BAD_REQUEST
+import play.api.test.Helpers.INTERNAL_SERVER_ERROR
+import play.api.test.Helpers.NOT_FOUND
+import play.api.test.Helpers.NO_CONTENT
+import play.api.test.Helpers.OK
+import play.api.test.Helpers.contentAsJson
+import play.api.test.Helpers.defaultAwaitTimeout
+import play.api.test.Helpers.status
+import services.ExpensesService
 
 class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext

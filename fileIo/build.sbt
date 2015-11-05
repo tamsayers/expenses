@@ -10,4 +10,4 @@ libraryDependencies ++= compileDependencies ++ testDependencies ++ Common.testDe
 
 EclipseKeys.skipParents in ThisBuild := false
 
-EclipseKeys.withSource := true
+EclipseKeys.withSource in ThisBuild := true
