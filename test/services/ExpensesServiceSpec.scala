@@ -38,7 +38,7 @@ class ExpensesServiceSpec extends PlaySpec with FutureAwaits with DefaultAwaitTi
       val dateQuery = testExpensesQuery()
       when(expensesRepo.forDates(dateQuery)).thenReturn(async(expenses))
 
-      val result = expensesService.forDates(dateQuery)
+      val result = expensesService.forDatesOld(dateQuery)
 
       await(result) mustBe expenses
     }

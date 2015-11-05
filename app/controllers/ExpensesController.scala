@@ -36,7 +36,7 @@ class ExpensesController(expensesService: ExpensesService)(implicit ex: Executio
   }
 
   def forDates(from: LocalDate, till: LocalDate, supplier: Option[String] = None) = Action.async {
-    expensesService.forDates(ExpensesQuery(from, till, supplier)).map { expenses =>
+    expensesService.forDatesOld(ExpensesQuery(from, till, supplier)).map { expenses =>
       Ok(Json.toJson(expenses))
     }
   }
