@@ -4,14 +4,14 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
 sealed trait CostType {
-  def name: String = getClass.getSimpleName
+  def name: String
 }
 
 private object CostType {
   def apply(name: String): CostType = name match {
-    case "Vatable" => Vatable()
-    case "Mileage" => Mileage()
-    case _  => Simple()
+    case "Vatable" => Vatable
+    case "Mileage" => Mileage
+    case _  => Simple
   }
   implicit val costTypeReads: Reads[CostType] = JsPath.read[String].map(CostType.apply)
   implicit val costTypeWrite: Writes[CostType] = Writes {
@@ -19,9 +19,15 @@ private object CostType {
   }
 }
 
-case class Simple() extends CostType
-case class Vatable() extends CostType
-case class Mileage() extends CostType
+case object Simple extends CostType {
+  val name = "Simple"
+}
+case object Vatable extends CostType {
+  val name = "Vatable"
+}
+case object Mileage extends CostType {
+  val name = "Mileage"
+}
 
 case class Cost(amount: BigDecimal, costType: CostType)
 

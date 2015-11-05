@@ -4,7 +4,7 @@
     "description":"description",
     "clientName":"client",
     "supplier":"supplier",
-    "cost":{
+    "amount":{
       "gross":1.99,
       "net":1.99
     }
@@ -14,7 +14,7 @@
     "description":"description",
     "clientName":"client",
     "supplier":"supplier",
-    "cost":{
+    "amount":{
       "gross":1.99,
       "net":1.99
     }

@@ -4,9 +4,9 @@
     "description":"description",
     "clientName":"client",
     "supplier":"test-supplier",
-    "cost":{
-      "gross":100,
-      "net":100
+    "amount":{
+      "gross":100.00,
+      "net":100.00
     }
   },
   {
@@ -14,7 +14,7 @@
     "description":"description",
     "clientName":"client",
     "supplier":"test-supplier",
-    "cost":{
+    "amount":{
       "gross":2.99,
       "net":2.99
     }

@@ -42,7 +42,7 @@ class ExpensesServiceSpec extends PlaySpec with FutureAwaits with DefaultAwaitTi
       await(result) mustBe expenses
     }
 
-    "get the simple expenses for the date query from the repository and create the company costs" in new testService {
+    "get the repository expenses for the date query and create the company costs" in new testService {
       val dateQuery = testExpensesQuery()
       when(expensesRepo.forDates(dateQuery)).thenReturn(async(expenses))
 

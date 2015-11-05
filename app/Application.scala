@@ -12,7 +12,7 @@ import com.teck.fileio.FileIoActor
 import java.nio.file.Paths
 
 trait Application extends ServicesModule {
-  val vatRate = 0.2
+  val vatRate: BigDecimal = 0.2
   val ex: ExecutionContext = play.api.libs.concurrent.Execution.Implicits.defaultContext
   lazy val actorSystem = ActorSystem("expenses")
   lazy val expensesFilePath = Paths.get("/var", "expenses", "expenses.json")

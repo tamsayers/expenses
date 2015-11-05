@@ -14,7 +14,6 @@ import scala.io.Source
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.Ignore
 
-@Ignore
 class ExpensesForDatesAccTest extends PlaySpec
     with OneAppPerSuite
     with RouteInvokers
