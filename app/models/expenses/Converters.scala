@@ -10,10 +10,6 @@ object Converters {
       CompanyCost(date, description, clientName, supplier, amountFor(expense.cost))
   }
 
-  val toCompanyCostFromExpenseWithVatRate: BigDecimal => Expense => CompanyCost = implicit vatRate => expense => {
-      toCompanyCostFromExpenseWithExpenseRates(ExpenseRates(vat = vatRate, mileage = 0))(expense)
-  }
-
   private def amountFor(cost: Cost)(implicit rates: ExpenseRates): Amount = cost.costType match {
     case Vatable => {
       val vatAmount = (cost.amount / (rates.vat + 1)) * rates.vat

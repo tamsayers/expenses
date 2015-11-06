@@ -9,16 +9,17 @@ import models.expenses.TestHelpers._
 import play.api.test._
 import repos.ExpensesRepository
 import models.expenses.Converters
+import models.expenses.ExpenseRates
 
 class ExpensesServiceSpec extends PlaySpec with FutureAwaits with DefaultAwaitTimeout with MockitoSugar {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-  val vatRate = 0.2
+  val expenseRates = ExpenseRates(vat = 0.2, mileage = 0.45)
   val expenses = List(testExpense())
 
   trait testService {
     val expensesRepo = mock[ExpensesRepository]
-    val expensesService = new RepositoryExpensesService(expensesRepo, vatRate)
+    val expensesService = new RepositoryExpensesService(expensesRepo, expenseRates)
   }
 
   "save" should {
@@ -39,7 +40,7 @@ class ExpensesServiceSpec extends PlaySpec with FutureAwaits with DefaultAwaitTi
 
       val result = expensesService.forDates(dateQuery)
 
-      await(result) mustBe expenses.map(Converters.toCompanyCostFromExpenseWithVatRate(vatRate))
+      await(result) mustBe expenses.map(Converters.toCompanyCostFromExpenseWithExpenseRates(expenseRates))
     }
   }
 }

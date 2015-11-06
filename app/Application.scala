@@ -10,9 +10,10 @@ import com.teck.fileio.TextFileActor
 import akka.actor.Props
 import com.teck.fileio.FileIoActor
 import java.nio.file.Paths
+import models.expenses.ExpenseRates
 
 trait Application extends ServicesModule {
-  val vatRate: BigDecimal = 0.2
+  val expenseRates: ExpenseRates = ExpenseRates(vat = 0.2, mileage = 0.45)
   val ex: ExecutionContext = play.api.libs.concurrent.Execution.Implicits.defaultContext
   lazy val actorSystem = ActorSystem("expenses")
   lazy val expensesFilePath = Paths.get("/var", "expenses", "expenses.json")
