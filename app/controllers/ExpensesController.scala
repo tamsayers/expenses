@@ -42,8 +42,8 @@ class ExpensesController(expensesService: ExpensesService)(implicit ex: Executio
     val AcceptCsv = Accepting("text/csv")
     expensesService.forDates(ExpensesQuery(from, till, supplier)).map { companyCosts =>
       request match {
-        case Accepts.Json() => Ok(Json.toJson(companyCosts))
-        case _ => Ok(Csv.toCsv(companyCosts)).withHeaders(("Content-Type" -> "text/csv"))
+        case AcceptCsv() => Ok(Csv.toCsv(companyCosts)).withHeaders(("Content-Type" -> "text/csv"))
+        case _ => Ok(Json.toJson(companyCosts))
       }
     }
   }
