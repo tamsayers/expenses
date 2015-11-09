@@ -1,38 +1,29 @@
 package controllers
 
 import java.time.LocalDate
-
 import scala.async.Async.async
 import scala.concurrent.Future
-
 import org.mockito.Matchers.any
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-
 import converters.ToJson
 import models.expenses.TestHelpers
 import models.expenses.TestHelpers.defaultExpensesJson
 import models.expenses.TestHelpers.testExpense
 import play.api.data.validation.ValidationError
 import play.api.libs.concurrent.Execution.Implicits
-import play.api.libs.json.JsArray
-import play.api.libs.json.JsPath
-import play.api.libs.json.Json
+import play.api.libs.json._
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.mvc.Result
 import play.api.mvc.Results
 import play.api.test.FakeRequest
-import play.api.test.Helpers.BAD_REQUEST
-import play.api.test.Helpers.INTERNAL_SERVER_ERROR
-import play.api.test.Helpers.NOT_FOUND
-import play.api.test.Helpers.NO_CONTENT
-import play.api.test.Helpers.OK
-import play.api.test.Helpers.contentAsJson
-import play.api.test.Helpers.defaultAwaitTimeout
-import play.api.test.Helpers.status
+import play.api.test.Helpers._
 import services.ExpensesService
+import converters.csv.Csv
+import play.api.http.HeaderNames
+import play.api.http.MimeTypes
 
 class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -97,7 +88,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
     import models.expenses.TestHelpers._
     val till = LocalDate.now()
     val from = LocalDate.now().minusDays(3)
-    val companyCosts = List(testCompanyCost(description = "desc1"), testCompanyCost(description = "desc2"))
+    val companyCosts = Seq(testCompanyCost(description = "desc1"), testCompanyCost(description = "desc2"))
 
     "get the expenses in the given range" in new testController {
       when(expensesService.forDates(any())).thenReturn(async(Nil))
@@ -111,28 +102,27 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
     "get the expenses in json format" in new testController {
       when(expensesService.forDates(testExpensesQuery(from = from, till = till))).thenReturn(async(companyCosts))
 
-      val result = controller.forDates(from, till)(FakeRequest())
+      val result = controller.forDates(from, till)(FakeRequest().withHeaders((HeaderNames.ACCEPT -> MimeTypes.JSON)))
 
       val json = contentAsJson(result)
       json.as[JsArray].value.size mustBe 2
       (json(0) \ "description").as[String] mustBe "desc1"
     }
 
-//    "get the expenses in csv format" in new testController {
-//    	when(expensesService.forDates(testExpensesQuery(from = from, till = till))).thenReturn(async(expenses))
-//
-//    	val result = controller.forDates(from, till)(FakeRequest().withHeaders(("Accepts" -> "text/csv")))
-//
-//    	val csv = contentAsString(result)
-////    	json.as[JsArray].value.size mustBe 2
-////    	(json(0) \ "description").as[String] mustBe "desc1"
-//    }
+    "get the expenses in csv format" in new testController {
+      when(expensesService.forDates(testExpensesQuery(from = from, till = till))).thenReturn(async(companyCosts))
+
+      val result = controller.forDates(from, till)(FakeRequest().withHeaders((HeaderNames.ACCEPT -> "text/csv")))
+
+      val csv = contentAsString(result)
+      csv mustBe Csv.toCsv(companyCosts)
+    }
 
     "get the expenses for the given range and supplier" in new testController {
       val supplier = Some("sup")
       when(expensesService.forDates(testExpensesQuery(from = from, till = till, supplier = supplier))).thenReturn(async(companyCosts))
 
-      val result = controller.forDates(from, till, supplier)(FakeRequest())
+      val result = controller.forDates(from, till, supplier)(FakeRequest().withHeaders((HeaderNames.ACCEPT -> MimeTypes.JSON)))
 
       val json = contentAsJson(result)
       (json(0) \ "description").as[String] mustBe "desc1"

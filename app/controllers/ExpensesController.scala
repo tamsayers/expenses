@@ -18,6 +18,9 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.JsPath
 import play.api.libs.json.JsObject
 import converters.JsonConverters
+import play.api.mvc.Accepting
+import play.api.http.MimeTypes
+import converters.csv.Csv
 
 class ExpensesController(expensesService: ExpensesService)(implicit ex: ExecutionContext) extends Controller with JsonConverters {
 
@@ -35,9 +38,13 @@ class ExpensesController(expensesService: ExpensesService)(implicit ex: Executio
     }
   }
 
-  def forDates(from: LocalDate, till: LocalDate, supplier: Option[String] = None) = Action.async {
+  def forDates(from: LocalDate, till: LocalDate, supplier: Option[String] = None) = Action.async { request => 
+    val AcceptCsv = Accepting("text/csv")
     expensesService.forDates(ExpensesQuery(from, till, supplier)).map { companyCosts =>
-      Ok(Json.toJson(companyCosts))
+      request match {
+        case Accepts.Json() => Ok(Json.toJson(companyCosts))
+        case _ => Ok(Csv.toCsv(companyCosts)).withHeaders(("Content-Type" -> "text/csv"))
+      }
     }
   }
 }
