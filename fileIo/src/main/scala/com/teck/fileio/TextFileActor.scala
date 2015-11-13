@@ -23,11 +23,12 @@ class TextFileActor(fileIoMaker: ActorRefFactory => ActorRef) extends Actor {
   def initialised: Receive = {
     case Save(text) => {
       fileIo ! Write(text)
-      savedText = text
-      // temporary work around
+      savedText += text
       sender ! "ok"
     }
-    case GetText => sender ! FileText(text = savedText)
+    case GetText => {
+      sender ! FileText(text = savedText)
+    }
     case Persisted =>
   }
 

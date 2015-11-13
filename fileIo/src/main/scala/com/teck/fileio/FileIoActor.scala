@@ -18,7 +18,7 @@ class FileIoActor(filePath: Path) extends Actor {
       sender ! Content(text = text)
     }
     case Write(text) => {
-      write(filePath, text.getBytes("UTF-8"), WRITE, TRUNCATE_EXISTING, CREATE)
+      write(filePath, text.getBytes("UTF-8"), WRITE, APPEND, CREATE)
       sender ! Persisted
     }
   }

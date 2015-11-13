@@ -15,21 +15,22 @@ trait ExpensesRepository {
   def forDates(ExpensesQuery: ExpensesQuery): Future[Seq[Expense]]
 }
 
+private object SaveFormat {
+  def apply(jsonObjects: String): String = jsonObjects + ","
+  def unapply(savedContent: String): Option[String] = if (savedContent == "") None else Some(savedContent.dropRight(1))
+}
+
 class JsonExpensesRepository(fileIo: FileIO)(implicit ex: ExecutionContext) extends ExpensesRepository {
-  def save(expenses: Seq[Expense]): Future[Unit] = fileIo.read.flatMap { saved =>
-    val savedExpenses = if (saved == "") JsArray() else parse(saved).as[JsArray]
-    val updatedExpenses = savedExpenses ++ toJson(expenses).as[JsArray]
-    fileIo.save(updatedExpenses.toString())
-  }
+  def save(expenses: Seq[Expense]): Future[Unit] = fileIo.save(SaveFormat(expenses.map(exp => toJson(exp)).mkString(",")))
 
   def forDates(expensesQuery: ExpensesQuery): Future[Seq[Expense]] = fileIo.read.map {
-    case "" => Nil
-    case saved => parse(saved).as[Seq[Expense]].filter(validFor(expensesQuery))
+    case SaveFormat(saved) => parse(s"[$saved]").as[Seq[Expense]].filter(validFor(expensesQuery))
+    case _ => Nil
   }
 
   private def validFor(expensesQuery: ExpensesQuery): Expense => Boolean = { expense =>
     val inRange = expense.date.isAfter(expensesQuery.from.minusDays(1)) && expense.date.isBefore(expensesQuery.till.plusDays(1))
-    def rightSuppier = expensesQuery.supplier.map { _ == expense.supplier }.getOrElse(true)
+    lazy val rightSuppier = expensesQuery.supplier.map { _ == expense.supplier }.getOrElse(true)
 
     inRange && rightSuppier
   }

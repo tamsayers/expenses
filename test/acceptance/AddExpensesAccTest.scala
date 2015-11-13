@@ -9,9 +9,13 @@ import scala.io.Source
 import play.api.test._
 import play.api.test.Helpers._
 import play.api.libs.json.JsValue
+import play.api.Environment
+import loader.MacwireApplicationLoader
+import play.api.ApplicationLoader
+import play.api.Application
 
 class AddExpensesAccTest extends PlaySpec
-    with OneAppPerSuite
+    with AccTestSingleApp
     with RouteInvokers
     with Writeables
     with BeforeAndAfterAll {

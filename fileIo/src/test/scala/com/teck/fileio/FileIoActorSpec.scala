@@ -32,10 +32,12 @@ class FileIoActorSpec extends TestKit(ActorSystem("FileActorSpec")) with Implici
     "persist the text to the file" in {
       fileActor ! Write(text = "new file contents")
 
-      awaitAssert(Files.readAllLines(testFilePath).mkString mustBe "new file contents", 2 seconds, 500 millis )
+      val expectedContents = text + "new file contents"
+
+      awaitAssert(Files.readAllLines(testFilePath).mkString mustBe expectedContents, 2 seconds, 500 millis )
     }
     "responds when written" in {
-      fileActor ! Write(text = "new file contents")
+      fileActor ! Write(text = "to write")
 
       expectMsg(1 second, "no written response", Persisted)
     }

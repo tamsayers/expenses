@@ -9,7 +9,7 @@ package object repos {
   import com.softwaremill.macwire._
 
   trait ReposModule {
-    import play.api.libs.concurrent.Execution.Implicits.defaultContext
+    implicit val ex: ExecutionContext = play.api.libs.concurrent.Execution.Implicits.defaultContext
 
     val textFileActor: ActorRef
     val fileIo: FileIO = wire[ActorFileIO]

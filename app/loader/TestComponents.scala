@@ -1,6 +1,9 @@
-import java.nio.file.Paths
+package loader
+
 import java.nio.file.Files
 
-object TestApplication extends Application {
+trait TestComponents extends ProdComponents {
   override lazy val expensesFilePath = Files.createTempFile("testExpenses", ".json")
 }
+
+object TestComponents extends TestComponents

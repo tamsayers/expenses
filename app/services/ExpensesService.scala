@@ -17,7 +17,7 @@ trait ExpensesService {
 class RepositoryExpensesService(expensesRepo: ExpensesRepository, expenseRates: ExpenseRates)
                                (implicit val ex: ExecutionContext) extends ExpensesService {
   def save(expenses: Seq[Expense]): Future[Unit] = expensesRepo.save(expenses)
-  def forDates(ExpensesQuery: ExpensesQuery): Future[Seq[CompanyCost]] = expensesRepo.forDates(ExpensesQuery).map {
-    _.map(Converters.toCompanyCostFromExpenseWithExpenseRates(expenseRates))
+  def forDates(expensesQuery: ExpensesQuery): Future[Seq[CompanyCost]] = expensesRepo.forDates(expensesQuery).map { expenses =>
+    expenses.map(Converters.toCompanyCostFromExpenseWithExpenseRates(expenseRates))
   }
 }

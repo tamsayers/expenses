@@ -60,7 +60,7 @@ class TextFileActorSpec extends TestKit(ActorSystem("FileActorSpec"))
     "update the file content with the new text" in new inititialisedFileActor {
       fileActor ! saveMessage
 
-      fileActor.underlyingActor.savedText mustBe saveMessage.text
+      fileActor.underlyingActor.savedText mustBe savedText + saveMessage.text
       expectMsg(500 millis, "no response received", "ok")
     }
   }

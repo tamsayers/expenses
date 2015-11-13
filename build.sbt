@@ -7,6 +7,8 @@ dockerBaseImage := "java:8"
 
 version := "1.0.0-SNAPSHOT"
 
+scalaVersion := Common.scalaVersion
+
 lazy val fileIo = project
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
@@ -14,18 +16,19 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
                                       .aggregate(fileIo)
                                       .dependsOn(fileIo)
 
-scalaVersion := Common.scalaVersion
-
 val dependencies = Seq(
-  "com.softwaremill.macwire" % "macros_2.11" % "1.0.7",
+  "com.softwaremill.macwire" % "macros_2.11" % "2.1.0",
+  "com.softwaremill.macwire" % "util_2.11" % "2.1.0",
   "org.scala-lang.modules" % "scala-async_2.11" % "0.9.3")
 
 val testDependencies = Seq(
-  "org.scalatestplus" % "play_2.11" % "1.2.0",
+  "org.scalatestplus" % "play_2.11" % "1.4.0-M4",
   "org.mockito" % "mockito-all" % "1.10.19").map(_ % "test")
   
 libraryDependencies ++= dependencies ++ testDependencies ++ Common.testDependencies
 
 routesImport += "converters.PathBinders._"
 
-EclipseKeys.withSource in ThisBuild := true
+routesGenerator := InjectedRoutesGenerator
+
+EclipseKeys.preTasks := Seq(compile in Compile)

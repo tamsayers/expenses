@@ -19,7 +19,15 @@ class CompanyCostSpec extends PlaySpec with MockitoSugar {
 
       val expectedCost = companyCosts.head
       import expectedCost._
-      csv.split("\n")(1) mustBe s"$date,$description,$clientName,$supplier,${amount.gross},${amount.net},${amount.vat},${amount.details}"
+      csv.split("\n")(1) mustBe s"$date,$description,$clientName,$supplier,${amount.gross},${amount.net},,"
+    }
+
+    "write a detailed data row" in {
+      val csv = CompanyCost.companyCostsCsvWriter.write(companyCosts)
+
+      val expectedCost = companyCosts(1)
+      import expectedCost._
+      csv.split("\n")(2) mustBe s"$date,$description,$clientName,$supplier,${amount.gross},${amount.net},${amount.vat.get},${amount.details.get}"
     }
   }
 }

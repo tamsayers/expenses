@@ -24,17 +24,10 @@ class JsonExpensesRepositorySpec extends PlaySpec with FutureAwaits with Default
   }
 
   "save" should {
-    val exp = Seq(testExpense())
+    val exp = Seq(testExpense(),testExpense())
     val saveResult = async{}
-    "add the expenses to the file" in new testRepo {
-      when(fileIo.read()).thenReturn(async(""))
-      when(fileIo.save(s"""[${defaultExpensesJson}]""")).thenReturn(saveResult)
-
-      await(repo.save(exp)) mustBe ({})
-    }
-    "add to the existing expenses in the file" in new testRepo {
-      when(fileIo.read()).thenReturn(async("[]"))
-      when(fileIo.save(s"""[${defaultExpensesJson}]""")).thenReturn(saveResult)
+    "add the expenses JSON to the file" in new testRepo {
+      when(fileIo.save(s"$defaultExpensesJson,$defaultExpensesJson,")).thenReturn(saveResult)
 
       await(repo.save(exp)) mustBe ({})
     }
@@ -43,30 +36,30 @@ class JsonExpensesRepositorySpec extends PlaySpec with FutureAwaits with Default
   "for dates" should {
     val now = LocalDate.now()
     "read the expenses and return the ones for the specified date range" in new testRepo {
-      val exp = Seq(
+      val expenses = Seq(
           testExpense(date = now.minusDays(10)),
           testExpense(date = now.minusDays(5)),
           testExpense(date = now),
           testExpense(date = now.plusDays(2)),
           testExpense(date = now.plusDays(3))
           )
-      val expensesJson = Json.toJson(exp).toString
-      when(fileIo.read).thenReturn(async(expensesJson))
+      val expensesJsonObjects = expenses.map(exp => Json.toJson(exp) + ",").mkString
+      when(fileIo.read).thenReturn(async(expensesJsonObjects))
 
-      await(repo.forDates(testExpensesQuery(from = now.minusDays(5), till = now.plusDays(2)))) mustBe exp.slice(1, 4)
+      await(repo.forDates(testExpensesQuery(from = now.minusDays(5), till = now.plusDays(2)))) mustBe expenses.slice(1, 4)
     }
     "read the expenses and return the ones for the specified supplier" in new testRepo {
-      val exp = Seq(
+      val expenses = Seq(
           testExpense(supplier = "right-supplier", description = "desc1", date = now),
           testExpense(supplier = "right-supplier", description = "desc2", date = now),
           testExpense(description = "desc3", date = now),
           testExpense(supplier = "right-supplier", description = "desc4", date = now),
           testExpense(description = "desc5", date = now)
           )
-      val expensesJson = Json.toJson(exp).toString
-      when(fileIo.read).thenReturn(async(expensesJson))
+      val expensesJsonObjects = expenses.map(exp => Json.toJson(exp) + ",").mkString
+      when(fileIo.read).thenReturn(async(expensesJsonObjects))
 
-      await(repo.forDates(testExpensesQuery(supplier = Some("right-supplier")))) mustBe Seq(exp(0), exp(1), exp(3))
+      await(repo.forDates(testExpensesQuery(supplier = Some("right-supplier")))) mustBe Seq(expenses(0), expenses(1), expenses(3))
     }
     "give an empty sequence for no file content"in new testRepo {
       when(fileIo.read).thenReturn(async(""))

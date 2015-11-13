@@ -19,7 +19,7 @@ class ActorFileIO(textFileActor: ActorRef)(implicit ex: ExecutionContext) extend
 
   implicit val timeout = Timeout(5 seconds)
 
-  def read(): Future[String] = (textFileActor ? GetText).asInstanceOf[Future[FileText]].map(_.text)
+  def read(): Future[String] = (textFileActor ? GetText).mapTo[FileText].map(_.text)
 
   def save(text: String): Future[scala.Unit] = (textFileActor ? Save(text)).map { _ => }
 }
