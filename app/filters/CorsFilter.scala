@@ -14,14 +14,13 @@ object CorsFilter extends Filter {
 
   def apply(f: RequestHeader => Future[Result])(rh: RequestHeader): Future[Result] = {
     def wrap = rh.method match {
-    case "OPTIONS" => async(Results.NoContent)
-    case _ => f(rh)
-  }
-    wrap.map {_.withHeaders(
+      case "OPTIONS" => async(Results.NoContent)
+      case _ => f(rh)
+    }
+    wrap.map { _.withHeaders(
       "Access-Control-Allow-Origin" -> "*",
       "Access-Control-Allow-Methods" -> "POST, GET, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers" -> "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept")
     }
-
   }
 }

@@ -25,9 +25,9 @@ import play.api.http.HeaderNames
 import play.api.http.ContentTypes
 
 class ExpensesController(expensesService: ExpensesService)(implicit ex: ExecutionContext) extends Controller with JsonConverters {
-  private val AcceptCsv = Accepting("text/csv")
 
-  def addExpenses = Action.async { _.body.asJson match {
+  def addExpenses = Action.async {
+    _.body.asJson match {
       case Some(json) => json.validate[List[Expense]].fold(
         errors => async(BadRequest(errors.toJson)),
         expenses => expensesService.save(expenses).map(_ => NoContent).recover {
@@ -41,10 +41,10 @@ class ExpensesController(expensesService: ExpensesService)(implicit ex: Executio
     }
   }
 
-  def forDates(from: LocalDate, till: LocalDate, supplier: Option[String] = None) = Action.async { request => 
+  def forDates(from: LocalDate, till: LocalDate, supplier: Option[String] = None, contentType: Option[String] = None) = Action.async {
     expensesService.forDates(ExpensesQuery(from, till, supplier)).map { companyCosts =>
-      request match {
-        case AcceptCsv() => Ok(Csv.toCsv(companyCosts)).withHeaders((HeaderNames.CONTENT_TYPE -> ContentTypes.withCharset("text/csv")))
+      contentType match {
+        case Some("csv") => Ok(Csv.toCsv(companyCosts)).withHeaders((HeaderNames.CONTENT_TYPE -> ContentTypes.withCharset("text/csv")))
         case _ => Ok(Json.toJson(companyCosts)).withHeaders((HeaderNames.CONTENT_TYPE -> ContentTypes.JSON))
       }
     }

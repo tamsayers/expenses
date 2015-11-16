@@ -102,17 +102,17 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
     "get the expenses in json format" in new testController {
       when(expensesService.forDates(testExpensesQuery(from = from, till = till))).thenReturn(async(companyCosts))
 
-      val result = controller.forDates(from, till)(FakeRequest().withHeaders((HeaderNames.ACCEPT -> MimeTypes.JSON)))
+      val result = controller.forDates(from, till)(FakeRequest())
 
       val json = contentAsJson(result)
       json.as[JsArray].value.size mustBe 2
       (json(0) \ "description").as[String] mustBe "desc1"
     }
 
-    "get the expenses in csv format" in new testController {
+    "get the expenses in csv format request content type csv" in new testController {
       when(expensesService.forDates(testExpensesQuery(from = from, till = till))).thenReturn(async(companyCosts))
 
-      val result = controller.forDates(from, till)(FakeRequest().withHeaders((HeaderNames.ACCEPT -> "text/csv")))
+      val result = controller.forDates(from, till, contentType = Some("csv"))(FakeRequest())
 
       val csv = contentAsString(result)
       csv mustBe Csv.toCsv(companyCosts)
@@ -122,7 +122,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
       val supplier = Some("sup")
       when(expensesService.forDates(testExpensesQuery(from = from, till = till, supplier = supplier))).thenReturn(async(companyCosts))
 
-      val result = controller.forDates(from, till, supplier)(FakeRequest().withHeaders((HeaderNames.ACCEPT -> MimeTypes.JSON)))
+      val result = controller.forDates(from, till, supplier)(FakeRequest())
 
       val json = contentAsJson(result)
       (json(0) \ "description").as[String] mustBe "desc1"

@@ -15,7 +15,6 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.Ignore
 import play.api.http.HeaderNames
 import play.api.http.MimeTypes
-import test.RequestHelpers
 import scala.concurrent.Future
 import play.api.Application
 import loader.MacwireApplicationLoader
@@ -27,7 +26,6 @@ class ExpensesForDatesAccTest extends PlaySpec
     with AccTestSingleApp
     with RouteInvokers
     with Writeables
-    with RequestHelpers
     with DefaultAwaitTimeout
     with FutureAwaits {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -54,7 +52,7 @@ class ExpensesForDatesAccTest extends PlaySpec
   "expenses for a date range" should {
     "be retrieved in json format" in {
       setUpTestData
-      val result = route(FakeRequest("GET", "/expenses/2015-01-01/to/2015-01-31").acceptJson)
+      val result = route(FakeRequest("GET", "/expenses/2015-01-01/to/2015-01-31"))
 
       result mustBe 'defined
       contentAsString(result.get) mustBe Json.parse(expectedJson).toString
@@ -62,7 +60,7 @@ class ExpensesForDatesAccTest extends PlaySpec
 
     "be retrieved in csv format" in {
       setUpTestData
-      val result = route(FakeRequest("GET", "/expenses/2015-01-01/to/2015-01-31").acceptCsv)
+      val result = route(FakeRequest("GET", "/expenses/2015-01-01/to/2015-01-31?contentType=csv"))
 
       result mustBe 'defined
       contentAsString(result.get) mustBe expectedCsv
@@ -70,7 +68,7 @@ class ExpensesForDatesAccTest extends PlaySpec
 
     "be retrieved for a specific supplier" in {
       setUpTestData
-      val result = route(FakeRequest("GET", "/expenses/2015-02-01/to/2015-02-15?supplier=test-supplier").acceptJson)
+      val result = route(FakeRequest("GET", "/expenses/2015-02-01/to/2015-02-15?supplier=test-supplier"))
 
       result mustBe 'defined
       contentAsString(result.get) mustBe Json.parse(expectedForSupplierJson).toString
