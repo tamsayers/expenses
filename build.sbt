@@ -17,6 +17,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
                                       .dependsOn(fileIo)
 
 val dependencies = Seq(
+  filters,
   "com.softwaremill.macwire" % "macros_2.11" % "2.1.0",
   "com.softwaremill.macwire" % "util_2.11" % "2.1.0",
   "org.scala-lang.modules" % "scala-async_2.11" % "0.9.3")

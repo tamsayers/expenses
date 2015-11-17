@@ -7,17 +7,21 @@ import play.api.routing.Router
 import router.Routes
 import com.softwaremill.macwire._
 import javax.inject.Provider
+import play.filters.headers.SecurityHeadersFilter
+import play.filters.headers.SecurityHeadersConfigProvider
 
 class MacwireApplicationLoader extends ApplicationLoader {
+  import Environment._
   def load(context: Context) = context.environment.mode match {
-    case Mode.Test => (new BuiltInComponentsFromContext(context) with AppComponents with TestComponents).application
-    case _ => (new BuiltInComponentsFromContext(context) with AppComponents with ProdComponents).application
+    case Mode.Test => (new ContextComponents(context) with TestComponents).application
+    case Mode.Dev => (new ContextComponents(context) with DevComponents).application
+    case _ => (new ContextComponents(context) with ProductionComponents).application
   }
 }
 
-trait AppComponents extends BuiltInComponents {
+abstract class ContextComponents(context: Context) extends BuiltInComponentsFromContext(context) {
   def expensesController: ExpensesController
-  
+
   lazy val expensesControllerProvider: Provider[ExpensesController] = new Provider[ExpensesController] {
     def get() = expensesController
   }
@@ -26,4 +30,6 @@ trait AppComponents extends BuiltInComponents {
     lazy val prefix = "/"
     wire[Routes]
   }
+  lazy val securityHeadersConfig = wire[SecurityHeadersConfigProvider].get
+  lazy val filters = Seq(wire[SecurityHeadersFilter])
 }

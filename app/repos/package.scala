@@ -11,8 +11,8 @@ package object repos {
   trait ReposModule {
     implicit val ex: ExecutionContext = play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-    val textFileActor: ActorRef
-    val fileIo: FileIO = wire[ActorFileIO]
-    val expensesRepository = wire[JsonExpensesRepository]
+    def textFileActor: ActorRef
+    lazy val fileIo: FileIO = wire[ActorFileIO]
+    lazy val expensesRepository = wire[JsonExpensesRepository]
   }
 }
