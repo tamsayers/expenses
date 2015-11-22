@@ -45,7 +45,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
       val request = FakeRequest().withJsonBody(validJson)
     	when(expensesService.save(List(testExpense()))).thenReturn(async{})
 
-      val result = controller.addExpenses.apply(request)
+      val result = controller.addExpenses(request)
 
       status(result) mustBe NO_CONTENT
     }
@@ -54,7 +54,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
       val request = FakeRequest().withJsonBody(invalidJson)
       when(mockToJson.toJson).thenReturn(expectedErrorJson)
 
-      val result = controller.addExpenses.apply(request)
+      val result = controller.addExpenses(request)
 
       status(result) mustBe BAD_REQUEST
     }
@@ -63,7 +63,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
       when(mockToJson.toJson).thenReturn(expectedErrorJson)
       val request = FakeRequest().withJsonBody(invalidJson)
 
-      val result = controller.addExpenses.apply(request)
+      val result = controller.addExpenses(request)
 
       contentAsJson(result) mustBe expectedErrorJson
     }
@@ -72,7 +72,7 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
       val request = FakeRequest().withJsonBody(validJson)
       when(expensesService.save(List(testExpense()))).thenReturn(Future.failed(new Exception))
 
-      val result = controller.addExpenses.apply(request)
+      val result = controller.addExpenses(request)
 
       status(result) mustBe INTERNAL_SERVER_ERROR
     }
