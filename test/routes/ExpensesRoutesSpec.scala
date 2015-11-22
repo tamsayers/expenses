@@ -1,29 +1,28 @@
 package routes
 
+import java.time.LocalDate
+
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
-import play.api.test._
-import play.api.GlobalSettings
+
 import controllers.ExpensesController
-import org.mockito.Mockito._
-import play.core.Router
-import play.api.test.Writeables
-import play.api.test.FakeRequest
+import loader.ContextComponents
+import models.expenses.TestHelpers._
+import play.api.Application
+import play.api.ApplicationLoader
+import play.api.BuiltInComponentsFromContext
+import play.api.Environment
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.Action
 import play.api.mvc.Results
-import java.time.LocalDate
-import models.expenses.TestHelpers._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.Application
-import loader.AppComponents
-import play.api.Environment
+import play.api.test._
+import play.api.test.FakeRequest
+import play.api.test.Writeables
+import play.core.DefaultWebCommands
 import play.core.SourceMapper
 import play.core.WebCommands
-import play.api.Configuration
-import play.core.DefaultWebCommands
-import play.api.BuiltInComponentsFromContext
-import play.api.ApplicationLoader
 
 class ExpensesRoutesSpec extends PlaySpec
   with OneAppPerSuite
@@ -38,9 +37,9 @@ class ExpensesRoutesSpec extends PlaySpec
   val env: Environment = Environment.simple()
   val context = ApplicationLoader.createContext(env)
 
-  override implicit lazy val app: Application = (new BuiltInComponentsFromContext(context) with AppComponents {
+  override implicit lazy val app: Application = new ContextComponents(context) {
 	  val expensesController: ExpensesController = mockExpensesController
-  }).application
+  }.application
 
   trait mockExpensesController {
     reset(mockExpensesController)
