@@ -11,7 +11,7 @@ import play.api.libs.json.Json
 
 class AuthenticationController(authenticationService: AuthenticationService)(implicit ex: ExecutionContext) extends Controller {
   def authenticate(username: String, password: String) = Action.async {
-    authenticationService.authorize(username, password).map {
+    authenticationService.authenticate(username, password).map {
       case auth@Authenticated(_) => Ok(Json.toJson(auth))
       case Unauthenticated => Unauthorized
     }

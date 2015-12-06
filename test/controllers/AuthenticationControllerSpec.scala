@@ -23,7 +23,7 @@ class AuthenticationControllerSpec extends PlaySpec with MockitoSugar {
   
   "given username and password" should {
     "be ok when valid" in {
-      when(authenticationService.authorize(username, password)).thenReturn(Async.async{token})
+      when(authenticationService.authenticate(username, password)).thenReturn(Async.async{token})
 
       val result = controller.authenticate(username, password)(FakeRequest())
 
@@ -31,7 +31,7 @@ class AuthenticationControllerSpec extends PlaySpec with MockitoSugar {
     }
 
     "return authroization token when valid" in {
-      when(authenticationService.authorize(username, password)).thenReturn(Async.async{token})
+      when(authenticationService.authenticate(username, password)).thenReturn(Async.async{token})
 
       val result = controller.authenticate(username, password)(FakeRequest())
 
@@ -39,7 +39,7 @@ class AuthenticationControllerSpec extends PlaySpec with MockitoSugar {
     }
 
     "be unauthorized when invalid" in {
-      when(authenticationService.authorize(username, password)).thenReturn(Async.async{Unauthenticated})
+      when(authenticationService.authenticate(username, password)).thenReturn(Async.async{Unauthenticated})
 
       val result = controller.authenticate(username, password)(FakeRequest())
 
