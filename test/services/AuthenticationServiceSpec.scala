@@ -25,11 +25,14 @@ class AuthenticationServiceSpec extends PlaySpec with MockitoSugar with FutureAw
 	  val crypto = mock[Crypto]
     val userService = mock[UserService]
     val service = new CryptoAuthenticationService(crypto, userService)
-	  when(crypto.encryptAES(s"$userName|$password")).thenReturn(generatedToken)
   }
-  
+
+  trait testAuthenticate extends testAuthenticationService {
+    when(crypto.encryptAES(s"$userName|$password")).thenReturn(generatedToken)
+  }
+
   "authenticate" should {
-    "give authenticated for valid username and password" in new testAuthenticationService {
+    "give authenticated for valid username and password" in new testAuthenticate {
       when(crypto.sign(password, user.secretKey.getBytes)).thenReturn(user.passwordHash)
       when(userService.forName(userName)).thenReturn(Async.async { Some(user) })
       
@@ -38,7 +41,7 @@ class AuthenticationServiceSpec extends PlaySpec with MockitoSugar with FutureAw
       await(result) mustBe Authenticated(generatedToken)
     }
     
-    "give unauthenticated for invalid username" in new testAuthenticationService {
+    "give unauthenticated for invalid username" in new testAuthenticate {
       when(userService.forName(userName)).thenReturn(Async.async { None })
 
       val result = service.authenticate(userName, password)
@@ -46,13 +49,46 @@ class AuthenticationServiceSpec extends PlaySpec with MockitoSugar with FutureAw
       await(result) mustBe Unauthenticated
     }
 
-    "give unauthenticated for invalid password" in new testAuthenticationService {
+    "give unauthenticated for invalid password" in new testAuthenticate {
       when(crypto.sign(password, user.secretKey.getBytes)).thenReturn("wrong hash")
       when(userService.forName(userName)).thenReturn(Async.async { Some(user) })
 
       val result = service.authenticate(userName, password)
 
       await(result) mustBe Unauthenticated
+    }
+  }
+
+  trait testIsValid extends testAuthenticationService {
+	  when(crypto.decryptAES(generatedToken)).thenReturn(s"$userName|$password")
+	  val authenticated = Authenticated(generatedToken)
+  }
+
+  "is valid" should {
+    "give true for a valid authenticated token" in new testIsValid {
+      when(userService.forName(userName)).thenReturn(Async.async { Some(user) })
+      when(crypto.sign(password, user.secretKey.getBytes)).thenReturn(user.passwordHash)
+
+      val result = service.isValid(authenticated)
+
+      await(result) mustBe true
+    }
+
+    "give false for an authenticated token with an invalid user" in new testIsValid {
+      when(userService.forName(userName)).thenReturn(Async.async { None })
+
+      val result = service.isValid(authenticated)
+
+      await(result) mustBe false
+    }
+
+    "give false for an authenticated token with an invalid password" in new testIsValid {
+      when(userService.forName(userName)).thenReturn(Async.async { Some(user) })
+      when(crypto.sign(password, user.secretKey.getBytes)).thenReturn("wrong hash")
+
+      val result = service.isValid(authenticated)
+
+      await(result) mustBe false
     }
   }
 }
