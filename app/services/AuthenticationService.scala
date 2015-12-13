@@ -11,6 +11,7 @@ import scala.async.Async
 
 trait AuthenticationService {
   def authenticate(username: String, password: String): Future[Authentication]
+  def validate(authenticated: Authenticated): Future[Option[User]]
 }
 
 class CryptoAuthenticationService(crypto: Crypto, userService: UserService)
@@ -24,16 +25,21 @@ class CryptoAuthenticationService(crypto: Crypto, userService: UserService)
     }
   }
 
-  private def isValid(user: User, password: String): Boolean = crypto.sign(password, user.secretKey.getBytes).equals(user.passwordHash)
+  private def isValid(user: User, password: String): Boolean = {
+		val signed = crypto.sign(password, user.secretKey.getBytes)
+    val passHash = user.passwordHash
+    println(signed)
+    println(passHash)
+    signed.equals(passHash)
+  }
 
-  def isValid(authenticated: Authenticated): Future[Boolean] = crypto.decryptAES(authenticated.token)
-                                                                     .split('|') match {
+  def validate(authenticated: Authenticated): Future[Option[User]] = crypto.decryptAES(authenticated.token)
+                                                                           .split('|') match {
     case Array(userName, password) => userService.forName(userName).map {
-      _ match {
-        case Some(user) => isValid(user, password)
-        case None => false
+      _.flatMap { user =>
+        if (isValid(user, password)) Some(user) else None
       }
     }
-    case _ => Async.async { false }
+    case _ => Async.async { None }
   }
 }

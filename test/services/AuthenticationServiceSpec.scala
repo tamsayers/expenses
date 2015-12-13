@@ -59,36 +59,37 @@ class AuthenticationServiceSpec extends PlaySpec with MockitoSugar with FutureAw
     }
   }
 
-  trait testIsValid extends testAuthenticationService {
+  trait validate extends testAuthenticationService {
 	  when(crypto.decryptAES(generatedToken)).thenReturn(s"$userName|$password")
 	  val authenticated = Authenticated(generatedToken)
   }
 
-  "is valid" should {
-    "give true for a valid authenticated token" in new testIsValid {
+  "validate" should {
+    "give some user for a valid authenticated token" in new validate {
       when(userService.forName(userName)).thenReturn(Async.async { Some(user) })
       when(crypto.sign(password, user.secretKey.getBytes)).thenReturn(user.passwordHash)
 
-      val result = service.isValid(authenticated)
+      val result = service.validate(authenticated)
 
-      await(result) mustBe true
+      await(result) mustBe Some(user)
     }
 
-    "give false for an authenticated token with an invalid user" in new testIsValid {
+    "give none for an authenticated token with an invalid user" in new validate {
       when(userService.forName(userName)).thenReturn(Async.async { None })
 
-      val result = service.isValid(authenticated)
+      val result = service.validate(authenticated)
 
-      await(result) mustBe false
+      await(result) mustBe None
     }
 
-    "give false for an authenticated token with an invalid password" in new testIsValid {
+    "give none for an authenticated token with an invalid password" in new validate {
       when(userService.forName(userName)).thenReturn(Async.async { Some(user) })
       when(crypto.sign(password, user.secretKey.getBytes)).thenReturn("wrong hash")
 
-      val result = service.isValid(authenticated)
+      val result = service.validate(authenticated)
 
-      await(result) mustBe false
+      println(await(result))
+      await(result) mustBe None
     }
   }
 }
