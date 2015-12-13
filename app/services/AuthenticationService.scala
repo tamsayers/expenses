@@ -18,27 +18,19 @@ class CryptoAuthenticationService(crypto: Crypto, userService: UserService)
                                  (implicit val ex: ExecutionContext) extends AuthenticationService {
   def authenticate(userName: String, password: String): Future[Authentication] = {
     userService.forName(userName).map {
-      _ match {
-        case Some(user) if isValid(user, password) => Authenticated(crypto.encryptAES(s"$userName|$password"))
-        case _ => Unauthenticated
-      }
+      _.filter(isValid(password))
+       .map((usr) => Authenticated(crypto.encryptAES(s"$userName|$password")))
+       .getOrElse(Unauthenticated)
     }
   }
 
-  private def isValid(user: User, password: String): Boolean = {
-		val signed = crypto.sign(password, user.secretKey.getBytes)
-    val passHash = user.passwordHash
-    println(signed)
-    println(passHash)
-    signed.equals(passHash)
-  }
+  private def isValid(password: String)(user: User): Boolean = crypto.sign(password, user.secretKey.getBytes)
+                                                                     .equals(user.passwordHash)
 
   def validate(authenticated: Authenticated): Future[Option[User]] = crypto.decryptAES(authenticated.token)
                                                                            .split('|') match {
     case Array(userName, password) => userService.forName(userName).map {
-      _.flatMap { user =>
-        if (isValid(user, password)) Some(user) else None
-      }
+      _.filter(isValid(password))
     }
     case _ => Async.async { None }
   }
