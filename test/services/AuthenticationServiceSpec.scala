@@ -88,7 +88,6 @@ class AuthenticationServiceSpec extends PlaySpec with MockitoSugar with FutureAw
 
       val result = service.validate(authenticated)
 
-      println(await(result))
       await(result) mustBe None
     }
   }
