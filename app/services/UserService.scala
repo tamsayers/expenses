@@ -11,6 +11,6 @@ trait UserService {
 
 class StubUserService(implicit val ex: ExecutionContext)  extends UserService {
   def forName(userName: String): Future[Option[User]] = Async.async {
-    Map("name" -> User("name", "key", "hash")).get(userName)
+    Map("test.user" -> User("test.user", "key", "4290bac24d78e756163d8de9db5d6dc15c1da845")).get(userName)
   }
 }
