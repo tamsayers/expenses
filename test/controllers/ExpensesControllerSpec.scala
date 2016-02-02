@@ -24,6 +24,9 @@ import services.ExpensesService
 import converters.csv.Csv
 import play.api.http.HeaderNames
 import play.api.http.MimeTypes
+import services.AuthenticationService
+import play.api.mvc.ActionBuilder
+import play.api.mvc.Request
 
 class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -35,7 +38,10 @@ class ExpensesControllerSpec extends PlaySpec with Results with MockitoSugar {
   trait testController {
     val mockToJson: ToJson = mock[ToJson]
     val expensesService = mock[ExpensesService]
-    val controller = new ExpensesController(expensesService) {
+    val authenticationService = mock[AuthenticationService]
+
+    val controller = new ExpensesController(authenticationService, expensesService) with TestAuthenticatedAction {
+      val user = null
       override implicit def errorsToJson(errors: Seq[(JsPath, Seq[ValidationError])]): ToJson = mockToJson
     }
   }

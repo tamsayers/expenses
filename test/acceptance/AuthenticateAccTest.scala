@@ -14,8 +14,6 @@ class AuthenticateAccTest extends PlaySpec
     with BeforeAndAfterAll {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
   
-  case class AuthCredentials(username: String, password: String)
-  
   implicit class TestCredentials(credentials: AuthCredentials) {
     val optionalResult = route(FakeRequest("POST", "/authenticate").withBody(Json.format.writes(credentials)))
     optionalResult mustBe defined

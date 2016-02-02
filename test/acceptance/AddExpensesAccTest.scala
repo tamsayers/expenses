@@ -18,7 +18,8 @@ class AddExpensesAccTest extends PlaySpec
     with AccTestSingleApp
     with RouteInvokers
     with Writeables
-    with BeforeAndAfterAll {
+    with BeforeAndAfterAll
+    with HasAuthenticatedRequests {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
   val missingValueJson = Source.fromURL(getClass.getResource("/acceptance/expenses/add/hasMissingValues.json")).mkString
@@ -27,9 +28,18 @@ class AddExpensesAccTest extends PlaySpec
 
   def errorMessage(index: Int, property: String)(implicit result: JsValue): String = ((result \ "errors" \ s"obj[$index].$property")(0) \ "msg").as[String]
 
+  "an unauthorized response" should {
+    "be returned when no user token is supplied" in {
+      val optionalResult = route(FakeRequest("POST", "/expenses"))
+
+      optionalResult mustBe 'defined
+      status(optionalResult.get) mustBe 401
+    }
+  }
+
   "an error response" should {
     "be returned for expenses with missing values" in {
-      val optionalResult = route(FakeRequest("POST", "/expenses").withBody(Json.parse(missingValueJson)))
+      val optionalResult = route(authenticatedPostTo("/expenses").withBody(Json.parse(missingValueJson)))
 
       optionalResult mustBe defined
 
@@ -44,7 +54,7 @@ class AddExpensesAccTest extends PlaySpec
     }
 
     "be returned for an invalid date format" in {
-      val optionalResult = route(FakeRequest("POST", "/expenses").withBody(Json.parse(invalidDateJson)))
+      val optionalResult = route(authenticatedPostTo("/expenses").withBody(Json.parse(invalidDateJson)))
 
       optionalResult mustBe defined
       status(optionalResult.get) mustBe 400
@@ -53,8 +63,8 @@ class AddExpensesAccTest extends PlaySpec
       errorMessage(0, "date") mustBe "error.expected.localdate"
     }
 
-    "be returned for an cost value" in {
-      val optionalResult = route(FakeRequest("POST", "/expenses").withBody(Json.parse(invalidCostJson)))
+    "be returned for an invalid cost value" in {
+      val optionalResult = route(authenticatedPostTo("/expenses").withBody(Json.parse(invalidCostJson)))
 
       optionalResult mustBe defined
       status(optionalResult.get) mustBe 400

@@ -27,7 +27,8 @@ class ExpensesForDatesAccTest extends PlaySpec
     with RouteInvokers
     with Writeables
     with DefaultAwaitTimeout
-    with FutureAwaits {
+    with FutureAwaits
+    with HasAuthenticatedRequests {
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
   val toAddJson = Source.fromURL(getClass.getResource("/acceptance/daterange/toAdd.json")).mkString
@@ -40,8 +41,8 @@ class ExpensesForDatesAccTest extends PlaySpec
   Thread.sleep(500)
 
   lazy val setUpTestData = {
-    val simpleFutureResult = route(FakeRequest("POST", "/expenses").withBody(Json.parse(toAddJson))).get
-    val supplierFutureResult = route(FakeRequest("POST", "/expenses").withBody(Json.parse(forSupplierJson))).get
+    val simpleFutureResult = route(authenticatedPostTo("/expenses").withBody(Json.parse(toAddJson))).get
+    val supplierFutureResult = route(authenticatedPostTo("/expenses").withBody(Json.parse(forSupplierJson))).get
 
     await(simpleFutureResult)
     await(supplierFutureResult)
@@ -49,10 +50,20 @@ class ExpensesForDatesAccTest extends PlaySpec
     Thread.sleep(1000)
   }
 
+  "an unauthorized response" should {
+    "be returned when no user token is supplied" in {
+      setUpTestData
+      val optionalResult = route(FakeRequest("GET", "/expenses/2015-01-01/to/2015-01-31"))
+
+      optionalResult mustBe 'defined
+      status(optionalResult.get) mustBe 401
+    }
+  }
+
   "expenses for a date range" should {
     "be retrieved in json format" in {
       setUpTestData
-      val result = route(FakeRequest("GET", "/expenses/2015-01-01/to/2015-01-31"))
+      val result = route(authenticatedGetFrom("/expenses/2015-01-01/to/2015-01-31"))
 
       result mustBe 'defined
       contentAsString(result.get) mustBe Json.parse(expectedJson).toString
@@ -60,7 +71,7 @@ class ExpensesForDatesAccTest extends PlaySpec
 
     "be retrieved in csv format" in {
       setUpTestData
-      val result = route(FakeRequest("GET", "/expenses/2015-01-01/to/2015-01-31?contentType=csv"))
+      val result = route(authenticatedGetFrom("/expenses/2015-01-01/to/2015-01-31?contentType=csv"))
 
       result mustBe 'defined
       contentAsString(result.get) mustBe expectedCsv
@@ -68,7 +79,7 @@ class ExpensesForDatesAccTest extends PlaySpec
 
     "be retrieved for a specific supplier" in {
       setUpTestData
-      val result = route(FakeRequest("GET", "/expenses/2015-02-01/to/2015-02-15?supplier=test-supplier"))
+      val result = route(authenticatedGetFrom("/expenses/2015-02-01/to/2015-02-15?supplier=test-supplier"))
 
       result mustBe 'defined
       contentAsString(result.get) mustBe Json.parse(expectedForSupplierJson).toString

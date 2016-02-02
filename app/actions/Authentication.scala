@@ -16,18 +16,18 @@ trait Authentication {
 	implicit val ex: ExecutionContext
   def authenticationService: AuthenticationService
 
-  case class AuthenticatedRequest[A](val user: User, request: Request[A]) extends WrappedRequest[A](request)
+  class AuthenticatedRequest[A](val user: User, request: Request[A]) extends WrappedRequest[A](request)
 
   private val prefix = "Bearer "
 
   def unauth: Future[Result] = async(Unauthorized)
 
-  object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] {
+  val AuthenticatedAction = new ActionBuilder[AuthenticatedRequest] {
     def invokeBlock[A](request: Request[A],
                        block: AuthenticatedRequest[A] => Future[Result]) = authTokenFor(request) match {
       case Some(token) => authenticationService.validate(Authenticated(token))
                                                .flatMap {
-                                                 case Some(user) => block(AuthenticatedRequest(user, request))
+                                                 case Some(user) => block(new AuthenticatedRequest(user, request))
                                                  case _ => unauth
                                                }
       case _ => unauth
