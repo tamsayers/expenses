@@ -7,7 +7,7 @@ import play.api.libs.Crypto
 import models.auth.Authenticated
 import models.auth.Unauthenticated
 import scala.concurrent.ExecutionContext
-import scala.async.Async
+import scala.async.Async.async
 
 trait AuthenticationService {
   def authenticate(username: String, password: String): Future[Authentication]
@@ -27,11 +27,12 @@ class CryptoAuthenticationService(crypto: Crypto, userService: UserService)
   private def isValid(password: String)(user: User): Boolean = crypto.sign(password, user.secretKey.getBytes)
                                                                      .equals(user.passwordHash)
 
-  def validate(authenticated: Authenticated): Future[Option[User]] = crypto.decryptAES(authenticated.token)
-                                                                           .split('|') match {
+  def validate(authenticated: Authenticated): Future[Option[User]] = extractFrom(authenticated.token) match {
     case Array(userName, password) => userService.forName(userName).map {
       _.filter(isValid(password))
     }
-    case _ => Async.async { None }
+    case _ => async { None }
   }
+
+  private def extractFrom(token: String) = crypto.decryptAES(token).split('|')
 }
