@@ -5,16 +5,22 @@ import play.api.mvc.Controller
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import services.AuthenticationService
-import models.auth.Authenticated
-import models.auth.Unauthenticated
+import models.auth._
 import play.api.libs.json.Json
+import scala.async.Async.async
 
 class AuthenticationController(authenticationService: AuthenticationService)
                               (implicit ex: ExecutionContext) extends Controller {
-  def authenticate(username: String, password: String) = Action.async {
-    authenticationService.authenticate(username, password).map {
-      case auth@Authenticated(_) => Ok(Json.toJson(auth))
-      case Unauthenticated => Unauthorized
+  def authenticate = Action.async {
+    _.body.asJson match {
+      case Some(json) => json.validate[Credentials].fold(
+        error => async { Unauthorized },
+        credentials => authenticationService.authenticate(credentials.username, credentials.password).map {
+          case auth@Authenticated(_) => Ok(Json.toJson(auth))
+          case Unauthenticated => Unauthorized
+        }
+      )
+      case None => async { Unauthorized }
     }
   }
 }

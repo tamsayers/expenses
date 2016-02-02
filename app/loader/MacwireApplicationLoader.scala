@@ -9,6 +9,7 @@ import com.softwaremill.macwire._
 import javax.inject.Provider
 import play.filters.headers.SecurityHeadersFilter
 import play.filters.headers.SecurityHeadersConfigProvider
+import play.api.libs.Crypto
 
 class MacwireApplicationLoader extends ApplicationLoader {
   import Environment._
@@ -21,10 +22,16 @@ class MacwireApplicationLoader extends ApplicationLoader {
 
 abstract class ContextComponents(context: Context) extends BuiltInComponentsFromContext(context) {
   def expensesController: ExpensesController
+  def authenticationController: AuthenticationController
 
   lazy val expensesControllerProvider: Provider[ExpensesController] = new Provider[ExpensesController] {
     def get() = expensesController
   }
+
+  lazy val authenticationControllerProvider: Provider[AuthenticationController] = new Provider[AuthenticationController] {
+    def get() = authenticationController
+  }
+
   lazy val assets: Assets = wire[Assets]
   lazy val router: Router = {
     lazy val prefix = "/"

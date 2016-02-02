@@ -13,6 +13,7 @@ import models.expenses.ExpenseRates
 import com.teck.fileio.TextFileActor
 import scala.math.BigDecimal.double2bigDecimal
 import java.nio.file.Files
+import controllers.AuthenticationController
 
 object Environment {
   trait ProductionComponents extends ServicesModule {
@@ -23,6 +24,7 @@ object Environment {
     lazy val textFileActor: ActorRef = expensesActorSystem.actorOf(Props(classOf[TextFileActor], fileIoMaker), "textFile")
 
     lazy val expensesController = wire[ExpensesController]
+    lazy val authenticationController = wire[AuthenticationController]
   }
   
   trait TestComponents extends ProductionComponents {

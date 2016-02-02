@@ -1,12 +1,10 @@
 package routes
 
 import java.time.LocalDate
-
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
-
 import controllers.ExpensesController
 import loader.ContextComponents
 import models.expenses.TestHelpers._
@@ -23,30 +21,20 @@ import play.api.test.Writeables
 import play.core.DefaultWebCommands
 import play.core.SourceMapper
 import play.core.WebCommands
+import controllers.AuthenticationController
 
-class ExpensesRoutesSpec extends PlaySpec
-  with OneAppPerSuite
-  with MockitoSugar
+class ExpensesRoutesSpec extends MockControllerApplicationSpec
   with RouteInvokers
   with Writeables
   with FutureAwaits
   with DefaultAwaitTimeout {
 
-  val mockExpensesController: ExpensesController = mock[ExpensesController]
-
-  val env: Environment = Environment.simple()
-  val context = ApplicationLoader.createContext(env)
-
-  override implicit lazy val app: Application = new ContextComponents(context) {
-	  val expensesController: ExpensesController = mockExpensesController
-  }.application
-
   trait mockExpensesController {
     reset(mockExpensesController)
   }
 
-  "posting expenses" should {
-    "add them" in new mockExpensesController {
+  "post expenses" should {
+    "be defined" in new mockExpensesController {
       when(mockExpensesController.addExpenses).thenReturn(Action { Results.Ok })
 
       val result = route(FakeRequest("POST", "/expenses"))
@@ -55,8 +43,8 @@ class ExpensesRoutesSpec extends PlaySpec
     }
   }
 
-  "expenses for dates" should {
-    "get the expenses for the given dates" in new mockExpensesController {
+  "get expenses for dates" should {
+    "be defined" in new mockExpensesController {
       val from = LocalDate.of(2015,2,1)
       val till = LocalDate.of(2015,3,4)
       val expenses = List(testExpense(date = from), testExpense(date = till))
