@@ -24,15 +24,19 @@ trait Authentication {
 
   object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] {
     def invokeBlock[A](request: Request[A],
-                       block: (AuthenticatedRequest[A]) => Future[Result]) = request.headers
-                                                                                    .get("Authentication")
-                                                                                    .filter(_.startsWith(prefix))
-                                                                                    .map(_.drop(prefix.length))
-                                                                                    .map(token =>
-                                                                                      authenticationService.validate(Authenticated(token)).flatMap {
-                                                                                        case Some(user) => block(AuthenticatedRequest(user, request))
-                                                                                        case _ => unauth
-                                                                                      }
-                                                                                    ).getOrElse(unauth)
+                       block: AuthenticatedRequest[A] => Future[Result]) = authTokenFor(request) match {
+      case Some(token) => authenticationService.validate(Authenticated(token))
+                                               .flatMap {
+                                                 case Some(user) => block(AuthenticatedRequest(user, request))
+                                                 case _ => unauth
+                                               }
+      case _ => unauth
+    }
+
+    private def authTokenFor[A](request: Request[A]) = request.headers
+                                                              .get("Authentication")
+                                                              .filter(_.startsWith(prefix))
+                                                              .map(_.drop(prefix.length))
+                                                              
   }
 }
