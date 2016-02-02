@@ -41,10 +41,18 @@ class AuthenticationControllerSpec extends PlaySpec with MockitoSugar {
       contentAsJson(result) mustBe Json.parse("""{"token":"authentication token"}""")
     }
 
-    "be unauthorized when invalid" in {
+    "be unauthorized when invalid credentials" in {
       when(authenticationService.authenticate(credentials.username, credentials.password)).thenReturn(Async.async{Unauthenticated})
 
       val result = controller.authenticate()(testRequest)
+
+      status(result) mustBe UNAUTHORIZED
+    }
+
+    "be unauthorized when invalid json" in {
+      when(authenticationService.authenticate(credentials.username, credentials.password)).thenReturn(Async.async{Unauthenticated})
+
+      val result = controller.authenticate()(FakeRequest().withJsonBody(Json.parse("[]")))
 
       status(result) mustBe UNAUTHORIZED
     }

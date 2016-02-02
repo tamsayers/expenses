@@ -15,12 +15,14 @@ class AuthenticationController(authenticationService: AuthenticationService)
     _.body.asJson match {
       case Some(json) => json.validate[Credentials].fold(
         error => async { Unauthorized },
-        credentials => authenticationService.authenticate(credentials.username, credentials.password).map {
-          case auth@Authenticated(_) => Ok(Json.toJson(auth))
-          case Unauthenticated => Unauthorized
-        }
+        credentials => validate(credentials)
       )
       case None => async { Unauthorized }
     }
+  }
+
+  private def validate(credentials: Credentials) = authenticationService.authenticate(credentials.username, credentials.password).map {
+    case auth@Authenticated(_) => Ok(Json.toJson(auth))
+    case Unauthenticated => Unauthorized
   }
 }
